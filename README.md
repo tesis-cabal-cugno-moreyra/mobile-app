@@ -5,9 +5,19 @@
 yarn install
 ```
 
+Add this, at the root of your repo, with the name `capacitor.config.json`
+```
+{"appId":"com.utn.sicoin","appName":"Sicoin","bundledWebRuntime":false,"webDir":"dist","linuxAndroidStudioPath": "route/to/your/android/studio"}
+```
+
 ### Compiles and hot-reloads for development
 ```
 yarn serve
+```
+
+### Compiles and hot-reloads for development (with Capacitor)
+```
+yarn capacitor:serve
 ```
 
 ### Compiles and minifies for production
@@ -15,10 +25,11 @@ yarn serve
 yarn build
 ```
 
+### Compiles and minifies for production (with Capacitor)
+```
+yarn capacitor:build
+```
 ### Lints and fixes files
 ```
 yarn lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
