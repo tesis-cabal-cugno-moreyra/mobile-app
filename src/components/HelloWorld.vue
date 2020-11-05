@@ -43,6 +43,9 @@
           >
             {{ next.text }}
           </a>
+          <v-btn @click="$router.push('about')">
+            Holi
+          </v-btn>
         </v-row>
       </v-col>
 
