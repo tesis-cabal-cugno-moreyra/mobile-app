@@ -5,6 +5,11 @@
 yarn install
 ```
 
+Update apps structure
+```
+npx cap sync
+```
+
 Add this, at the root of your repo, with the name `capacitor.config.json`
 ```
 {"appId":"com.utn.sicoin","appName":"Sicoin","bundledWebRuntime":false,"webDir":"dist","linuxAndroidStudioPath": "route/to/your/android/studio"}
