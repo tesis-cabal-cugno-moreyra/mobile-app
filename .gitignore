@@ -25,8 +25,8 @@ pnpm-debug.log*
 capacitor.config.json
 
 # This files change when run 'npx cap sync'. 
-android/app/build.gradle
-android/app/src/main/assets/capacitor.config.json
-ios/App/App/capacitor.config.json
-ios/App/App/config.xml
-ios/App/Podfile
+/android/app/build.gradle
+/android/app/src/main/assets/capacitor.config.json
+/ios/App/App/capacitor.config.json
+/ios/App/App/config.xml
+/ios/App/Podfile
