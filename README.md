@@ -38,3 +38,14 @@ yarn capacitor:build
 ```
 yarn lint
 ```
+### Build APK
+First, run:
+```
+yarn build
+yarn capacitor:build
+npx cap sync
+```
+Then, open Android Studio and build the APK:
+```
+Build -> Build Bundle(s) / APK(s) -> Build APK(s)
+```
