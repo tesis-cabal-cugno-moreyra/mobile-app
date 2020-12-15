@@ -2,6 +2,7 @@
   <div class="home">
     <NavBar></NavBar>
     <HelloWorld/>
+    <v-btn v-on:click="goLogin" >Login</v-btn>
   </div>
 </template>
 
@@ -14,6 +15,11 @@ export default {
   components: {
     HelloWorld,
     NavBar
+  },
+  methods: {
+    goLogin() {
+      this.$router.push({name: 'Login'})
+    }
   }
 }
 </script>
