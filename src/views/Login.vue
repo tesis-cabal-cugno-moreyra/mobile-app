@@ -100,7 +100,7 @@
 
 <script>
 // import { mapGetters } from "vuex";
-// import authServices from "@/services/authServices";
+import authServices from "@/services/authServices";
 // import SignInSupervisor from "../components/SignInSupervisor.vue";
 
 export default {
@@ -129,38 +129,41 @@ export default {
         this.password !== "" &&
         this.loginError === false
       ) {
-        // let payload = { username: this.username, password: this.password };
-        // await this.$store
-        //   .dispatch("restAuth/login", payload)
-        //   .then(response => {
-        //     let accessToken = response.data.access_token;
-        //     let refreshToken = response.data.refresh_token;
-        //
-        //     this.$store.dispatch("restAuth/updateAccessToken", accessToken);
-        //     this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
-        //
-        //     let roles = authServices.getRoles();
-        //     let user = {
-        //       username: response.data.user.username,
-        //       email: response.data.user.email,
-        //       firstName: response.data.user.first_name,
-        //       lastName: response.data.user.last_name,
-        //       roles: roles
-        //     };
-        //     this.$store.dispatch("restAuth/updateUser", user);
-        //     this.$router.push({ name: "IncidentsView" });
-        //   })
-        //   .catch(e => {
-        //     if (e.status === 400 && e.statusText === "Bad Request") {
-        //       this.loginError = true;
-        //       this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
-        //     } else {
-        //       console.log(e);
-        //       this.loginError = true;
-        //       this.errorMessage = "Algo salió mal. Prueba de nuevo.";
-        //     }
-        //   });
-        alert("Hola!");
+        let payload = { username: this.username, password: this.password };
+        await this.$store
+          .dispatch("restAuth/login", payload)
+          .then(response => {
+            alert("Arranca Then");
+            let accessToken = response.data.access_token;
+            let refreshToken = response.data.refresh_token;
+
+            this.$store.dispatch("restAuth/updateAccessToken", accessToken);
+            this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
+
+            let roles = authServices.getRoles();
+            let user = {
+              username: response.data.user.username,
+              email: response.data.user.email,
+              firstName: response.data.user.first_name,
+              lastName: response.data.user.last_name,
+              roles: roles
+            };
+            this.$store.dispatch("restAuth/updateUser", user);
+            alert("Fin Then");
+            this.$router.push({ name: "Home" });
+          })
+          .catch(e => {
+            alert("Arranca catch")
+            if (e.status === 400 && e.statusText === "Bad Request") {
+              this.loginError = true;
+              this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
+            } else {
+              console.log(e);
+              this.loginError = true;
+              this.errorMessage = "Algo salió mal. Prueba de nuevo.";
+            }
+          });
+
       }
       this.tryToLogin = false;
     },
