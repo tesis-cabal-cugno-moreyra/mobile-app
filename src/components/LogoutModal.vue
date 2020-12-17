@@ -20,8 +20,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </div></template
->
+  </div>
+</template>
 <script>
 import router from "@/router";
 

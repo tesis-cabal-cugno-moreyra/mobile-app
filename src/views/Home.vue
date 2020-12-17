@@ -2,7 +2,6 @@
   <div class="home">
     <NavBar></NavBar>
     <HelloWorld/>
-    <v-btn v-on:click="goLogin" >Login</v-btn>
   </div>
 </template>
 

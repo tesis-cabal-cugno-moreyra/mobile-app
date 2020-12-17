@@ -133,7 +133,6 @@ export default {
         await this.$store
           .dispatch("restAuth/login", payload)
           .then(response => {
-            alert("Arranca Then");
             let accessToken = response.data.access_token;
             let refreshToken = response.data.refresh_token;
 
@@ -149,11 +148,9 @@ export default {
               roles: roles
             };
             this.$store.dispatch("restAuth/updateUser", user);
-            alert("Fin Then");
             this.$router.push({ name: "Home" });
           })
           .catch(e => {
-            alert("Arranca catch")
             if (e.status === 400 && e.statusText === "Bad Request") {
               this.loginError = true;
               this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
@@ -163,21 +160,6 @@ export default {
               this.errorMessage = "Algo salió mal. Prueba de nuevo.";
             }
           });
-
-        // let response = await fetch("https://tesis-cabal-cugno-moreyra-back.herokuapp.com/rest-auth/login/", {
-        //   method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        //   mode: 'cors', // no-cors, *cors, same-origin
-        //   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //     // 'Content-Type': 'application/x-www-form-urlencoded',
-        //   },
-        //   redirect: 'follow', // manual, *follow, error
-        //   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        //   body: JSON.stringify(payload) // body data type must match "Content-Type" header
-        // });
-        // console.log(response.json());
-
       }
       this.tryToLogin = false;
     },

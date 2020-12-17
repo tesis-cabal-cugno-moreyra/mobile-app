@@ -6,6 +6,7 @@ import authServices from "@/services/authServices";
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import About from '../views/About.vue'
+import Error from '../views/Error.vue'
 
 Vue.use(VueRouter)
 
@@ -13,6 +14,11 @@ const routes = [
   {
     path: "*",
     redirect: { name: "Error" }
+  },
+  {
+    path: "/error-page",
+    name: "Error",
+    component: Error
   },
   {
     path: '/',
@@ -102,7 +108,9 @@ router.beforeEach((to, from, next) => {
     isResource = authServices.isResource();
   } catch (e) {
     console.log(e);
-    //TODO: Add error view.
+    // next({
+    //   name: "Error"
+    // });
   }
   if (to.matched.some(record => record.meta.requires_auth)) {
     tokenCheck(to, next, isAdmin, isSupervisor, isResource, accessToken);
@@ -113,7 +121,7 @@ router.beforeEach((to, from, next) => {
       next();
     } else {
       next({
-        name: "IncidentsView"
+        name: "Home"
       });
     }
   } else {
