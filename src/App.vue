@@ -8,6 +8,14 @@
 <script>
 
 export default {
-  name: 'App'
+  name: 'App',
+  data() {
+    return {
+      logoutModal: false
+    };
+  },
+  async mounted() {
+    this.$vuetify.theme.dark = true;
+  }
 };
 </script>

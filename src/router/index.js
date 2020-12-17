@@ -67,7 +67,6 @@ const tokenCheck = (
     rolesCheck(to, next, isAdmin, isSupervisor, isResource);
   } else {
     //TODO: Renovar token, si no se puede mandar a vista de error! En la vista de error, decir que el token es invalido, y brindar boton a login. Vista de error toma título, texto del boton  y nombre de ruta a redireccionar ()
-    this.$store.dispatch("uiParams/hideNavBar");
     next({
       name: "Login"
     });

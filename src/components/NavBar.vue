@@ -52,6 +52,14 @@
         "
       ></v-switch>
       <v-divider></v-divider>
+      <v-list-item link v-on:click="openLogoutModal">
+        <v-list-item-icon>
+          <v-icon color="grey darken-1">mdi-logout</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title class="grey--text text--darken-1"
+        >Cerrar sesión</v-list-item-title
+        >
+      </v-list-item>
     </v-navigation-drawer>
 
     <v-app-bar app clipped-left>
@@ -60,15 +68,36 @@
       <v-toolbar-title>Sicoin</v-toolbar-title>
       <v-spacer></v-spacer>
     </v-app-bar>
+
+    <LogoutModal
+        :dialog="logoutModal"
+        v-on:close-modal="closeLogoutModal"
+    ></LogoutModal>
   </v-container>
 </template>
 
 <script>
+import LogoutModal from "@/components/LogoutModal";
+
 export default {
   name: "NavBar",
-  data: () => ({
-    drawer: false,
-  })
+  components: {
+    LogoutModal
+  },
+  data() {
+    return {
+      drawer: false,
+      logoutModal: false
+    };
+  },
+  methods: {
+    closeLogoutModal() {
+      this.logoutModal = false;
+    },
+    openLogoutModal() {
+      this.logoutModal = true;
+    }
+  }
 }
 </script>
 
