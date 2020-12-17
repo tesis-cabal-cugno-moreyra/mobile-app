@@ -13,17 +13,19 @@ export default new Vuetify({
     themes: {
       light: {
         primary: "#cc4125",
-        grey_selected: "#999999",
-        white_selected: "#FAFAFA",
-        black_selected: "#222222",
-        success: "#00e64d"
+        success: "#00e64d",
+        error: "#ff0000",
+        first_selected: "#302f2f", // Before, grey_selected
+        second_selected: "#999999", // Before, white_selected
+        third_selected: "#FAFAFA" // Before,  black_selected
       },
       dark: {
         primary: "#cc4125",
         success: "#009933",
-        grey_selected: "#999999",
-        white_selected: "#FAFAFA",
-        black_selected: "#222222"
+        error: "#ff0000",
+        first_selected: "#999999", // Before, grey_selected
+        second_selected: "#FAFAFA", // Before, white_selected
+        third_selected: "#222222" // Before,  black_selected
       }
     }
   }
