@@ -15,9 +15,12 @@
     "@capacitor/core": "^2.0.0",
     "@capacitor/ios": "^2.0.0",
     "@mdi/font": "^3.6.95",
+    "axios": "^0.21.0",
     "core-js": "^3.6.5",
+    "highlight.js": "^10.4.1",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
+    "vue-axios": "^2.1.5",
     "vue-router": "^3.2.0",
     "vuetify": "^2.2.11",
     "vuex": "^3.4.0"
