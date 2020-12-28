@@ -8,6 +8,9 @@ export default {
   changeSignInResourceState(state, value) {
     state.showSignInResource = value;
   },
+  changeShowEditUserState(state, value) {
+    state.showEditUser = value;
+  },
   dispatchAlert(state, payload) {
     state.snackbar.text = payload.text;
 

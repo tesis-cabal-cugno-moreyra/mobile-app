@@ -10,5 +10,10 @@ export default {
   },
   showSignInResource(state) {
     return state.showSignInResource;
+      },
+  showEditUser(state) {
+    return state.showEditUser;
   },
+
+
 };

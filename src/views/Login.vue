@@ -141,6 +141,7 @@ export default {
 
             let roles = authServices.getRoles();
             let user = {
+              id: response.data.user.pk,
               username: response.data.user.username,
               email: response.data.user.email,
               firstName: response.data.user.first_name,
@@ -212,7 +213,8 @@ export default {
   computed: {
     ...mapGetters({
       token: "restAuth/accessToken",
-      showSignInResource: "uiParams/showSignInResource"
+      showSignInResource: "uiParams/showSignInResource",
+
     })
   }
 

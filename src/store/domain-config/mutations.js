@@ -8,4 +8,7 @@ export default {
   changeSignInResourceState(state, value) {
     state.showSignInResource = value;
 },
+
+
+
 };
