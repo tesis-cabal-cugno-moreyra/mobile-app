@@ -2,8 +2,6 @@ export default {
   displaySpinnerOverlay: false,
   errorDetected: false,
   showNavBar: true,
-  showSignInSupervisor: false,
-  showSignInAdmin: false,
   showSignInResource: false,
   snackbar: {
     visible: false,
