@@ -66,5 +66,21 @@ export default {
       }
     });
   },
+  updateUser(context, payload) {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log(payload);
+        let jsonData = JSON.stringify(payload.email + payload.first_name + payload.last_name);
+        console.log(jsonData);
+        return resolve(
+           await api.put( `/api/v1/users/${payload.id}`, jsonData)
+        );
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  },
+
 
 };

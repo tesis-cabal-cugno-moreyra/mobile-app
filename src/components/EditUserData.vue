@@ -49,17 +49,6 @@
                         :error-messages="errorEmailField"
                     ></v-text-field>
                   </v-col>
-
-                  <v-col cols="12" sm="6">
-                    <v-autocomplete
-                        v-model="autoCompleteTypeResource"
-                        :items="typeResourceSelectedList"
-                        item-text="name"
-                        label="Cargo a ocupar"
-                        :rules="[v => !!v || 'Debe seleccionar un alias']"
-                        required
-                    ></v-autocomplete>
-                  </v-col>
                 </v-row>
               </v-container>
               <small>* Campos requeridos</small>
@@ -70,8 +59,8 @@
                   color="primary"
                   :loading="loadingCreate"
                   text
-                  v-on:click="validateAndCreateResource()"
-              >Enviar</v-btn
+                  v-on:click="validateAndEditUser()"
+              >Guardar</v-btn
               >
               <v-btn color="primary" text @click="onClose()">Cerrar</v-btn>
             </v-card-actions>
@@ -109,7 +98,7 @@ name: "EditUserData",
       typeResourceSelectedList: [],
       errorEmailField: null,
       errorUserNameField: null,
-      domainAccessCode: null
+      domainAccessCode: null,
     };
   },
   async mounted() {
@@ -125,16 +114,20 @@ name: "EditUserData",
           this.domainAccessCode = response.data.domain_code;
         });
 
-console.log(this.userInformation);
-          this.userName = this.userInformation.username;
-          this.firstName = this.userInformation.firstName;
-          this.lastName = this.userInformation.lastName;
-          this.email = this.userInformation.email;
-          this.autoCompleteTypeResource = this.userInformation.roles[0];
-          this.idUser = this.userInformation.id;
+    await this.$store
+        .dispatch("restAuth/user")
+        .then(response => {
+          this.domainAccessCode = response.data.domain_code;
+        });
 
 
   },
+  updated(){
+  this.mapData();
+
+},
+
+
   methods:{
   onClose(){
     this.$store.commit(
@@ -143,7 +136,42 @@ console.log(this.userInformation);
     );
     console.log(this.userInformation);
 
-  }
+  },
+    mapData()
+    {
+      console.log(this.userInformation.roles[0]);
+      this.userName = this.userInformation.username;
+      this.name = this.userInformation.firstName;
+      this.lastName = this.userInformation.lastName;
+      this.email = this.userInformation.email;
+      this.autoCompleteTypeResource = this.userInformation.roles[0];
+      this.idUser = this.userInformation.id;
+    },
+    async validateAndEditUser()
+    {
+      this.loadingCreate = true;
+      console.log(this.idUser
+      )
+      let userInfo = {
+        id : this.idUser,
+        first_name : this.userName,
+        last_name : this.lastName,
+        email : this.email,
+
+      }
+      await this.$store
+          .dispatch("domainConfig/updateUser", userInfo)
+          .then(response => {
+            let userId = response.data.id;
+            this.createResourceProfile(userId);
+          })
+          .catch(async responseError => {
+            if (responseError.data.email) {
+              this.errorEmailField = "Este email ya se encuetra registrado";
+            }})
+      this.loadingCreate = false;
+
+    }
   },
   computed: {
     ...mapGetters({
