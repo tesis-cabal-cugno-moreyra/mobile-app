@@ -114,61 +114,48 @@ name: "EditUserData",
           this.domainAccessCode = response.data.domain_code;
         });
 
-    await this.$store
-        .dispatch("restAuth/user")
-        .then(response => {
-          this.domainAccessCode = response.data.domain_code;
-        });
-
-
   },
   updated(){
   this.mapData();
-
 },
-
-
   methods:{
   onClose(){
     this.$store.commit(
         "uiParams/changeShowEditUserState",
         !this.showEditUser
     );
-    console.log(this.userInformation);
-
   },
     mapData()
     {
-      console.log(this.userInformation.roles[0]);
+      this.idUser = this.userInformation.id;
       this.userName = this.userInformation.username;
       this.name = this.userInformation.firstName;
       this.lastName = this.userInformation.lastName;
       this.email = this.userInformation.email;
       this.autoCompleteTypeResource = this.userInformation.roles[0];
-      this.idUser = this.userInformation.id;
     },
     async validateAndEditUser()
     {
       this.loadingCreate = true;
-      console.log(this.idUser
-      )
+
       let userInfo = {
         id : this.idUser,
         first_name : this.userName,
         last_name : this.lastName,
-        email : this.email,
+        email : this.email
 
       }
       await this.$store
           .dispatch("domainConfig/updateUser", userInfo)
-          .then(response => {
-            let userId = response.data.id;
-            this.createResourceProfile(userId);
+          .then( ()=> {
+            console.log("holis")
           })
-          .catch(async responseError => {
-            if (responseError.data.email) {
+          .catch(() => {
+            console.log("holis");
+         /*  if (responseError.data.email) {
               this.errorEmailField = "Este email ya se encuetra registrado";
-            }})
+            }*/
+          })
       this.loadingCreate = false;
 
     }
@@ -184,7 +171,3 @@ name: "EditUserData",
 }
 
 </script>
-
-<style scoped>
-
-</style>
