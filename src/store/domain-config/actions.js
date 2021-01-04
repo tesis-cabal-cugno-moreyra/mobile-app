@@ -70,9 +70,8 @@ export default {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       try {
-        let jsonData = JSON.stringify(payload);
-        console.log(jsonData);
-        await api.put( `/api/v1/users/${payload.id}/`, jsonData);
+        let data =  `/api/v1/users/${payload.id}/`;
+        return resolve(await api.put(data, payload));
 
       } catch (e) {
         return reject(e);

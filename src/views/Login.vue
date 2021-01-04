@@ -141,7 +141,7 @@ export default {
 
             let roles = authServices.getRoles();
             let user = {
-              id: response.data.user.pk,
+              id: response.data.user.id,
               username: response.data.user.username,
               email: response.data.user.email,
               firstName: response.data.user.first_name,

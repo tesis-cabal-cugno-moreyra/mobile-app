@@ -16,8 +16,7 @@
                       :rules="userNameRules"
                       autocomplete="off"
                       label="Nombre de usuario*"
-                      :error-messages="errorUserNameField"
-                      required
+                      disabled
                   ></v-text-field>
                 </v-col>
                   <v-col cols="12" sm="6" md="5">
@@ -115,8 +114,12 @@ name: "EditUserData",
         });
 
   },
-  updated(){
-  this.mapData();
+  watch: {
+    showEditUser()
+    {
+      this.mapData();
+    }
+
 },
   methods:{
   onClose(){
@@ -140,7 +143,7 @@ name: "EditUserData",
 
       let userInfo = {
         id : this.idUser,
-        first_name : this.userName,
+        first_name : this.name,
         last_name : this.lastName,
         email : this.email
 
@@ -148,13 +151,26 @@ name: "EditUserData",
       await this.$store
           .dispatch("domainConfig/updateUser", userInfo)
           .then( ()=> {
-            console.log("holis")
+            this.userInformation.firstName = userInfo.first_name;
+            this.userInformation.lastName = userInfo.last_name;
+            this.userInformation.email = userInfo.email;
+
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Información del usuario editada correctamente",
+              color: "success"
+            });
+            this.$store.commit(
+                "uiParams/changeShowEditUserState",
+                !this.showEditUser
+            );
           })
           .catch(() => {
-            console.log("holis");
-         /*  if (responseError.data.email) {
-              this.errorEmailField = "Este email ya se encuetra registrado";
-            }*/
+
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Hubo un problema con la edicion del usuario",
+              color: "primary"
+            });
+
           })
       this.loadingCreate = false;
 
