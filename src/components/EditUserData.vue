@@ -167,7 +167,7 @@ name: "EditUserData",
           .catch(() => {
 
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "Hubo un problema con la edicion del usuario",
+              text: "Hubo un problema con la edición del usuario",
               color: "primary"
             });
 

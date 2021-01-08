@@ -184,7 +184,7 @@ export default {
             })
             .catch(async responseError => {
               if (responseError.data.email) {
-                this.errorEmailField = "Este email ya se encuetra registrado";
+                this.errorEmailField = "Este email ya se encuentra registrado";
               }
               if (responseError.data.username) {
                 if (
@@ -196,12 +196,12 @@ export default {
                   return;
                 }
                 this.errorUserNameField =
-                    "Este usuario ya se encuetra registrado";
+                    "Este usuario ya se encuentra registrado";
                 return;
               }
               if (!responseError.data.email && !responseError.data.username) {
                 this.$store.commit("uiParams/dispatchAlert", {
-                  text: "Problemas para crear usuario intente luego",
+                  text: "Problemas para crear usuario, intente luego",
                   color: "primary"
                 });
               }
@@ -230,14 +230,14 @@ export default {
           .then(async () => {
             this.onClose();
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "Se creo el usuario recurso, debe esperar habilitacion",
+              text: "Se creó el usuario recurso, debe esperar habilitación",
               color: "success",
               timeout: 5000
             });
           })
           .catch(async () => {
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "Problemas dentro de la creacion del recurso",
+              text: "Problemas dentro de la creación del recurso",
               color: "primary"
             });
           });
