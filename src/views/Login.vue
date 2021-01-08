@@ -99,7 +99,7 @@
 </template>
 
 <script>
-// import { mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import authServices from "@/services/authServices";
 // import SignInSupervisor from "../components/SignInSupervisor.vue";
 
@@ -148,6 +148,11 @@ export default {
               roles: roles
             };
             this.$store.dispatch("restAuth/updateUser", user);
+            if (authServices.isResource()) {
+              this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
+            } else {
+              console.error("User is not a resource, so no device is registered")
+            }
             this.$router.push({ name: "Home" });
           })
           .catch(e => {
@@ -165,6 +170,14 @@ export default {
     },
     resetErrors: function() {
       this.loginError = false;
+    },
+
+    sendDeviceTokenOnLogin(resourceId) {
+      if (!resourceId) {
+        console.error("User set as resource but has no related profile")
+        return
+      }
+      this.$store.dispatch("fcmConfiguration/sendCurrentDeviceTokenToBackend", resourceId)
     },
 
     async SendConfirm(requiredCode) {
@@ -213,13 +226,10 @@ export default {
       //   );
     }
   },
-  /*
   computed: {
     ...mapGetters({
-      token: "restAuth/accessToken",
-      showSignInSupervisor: "uiParams/showSignInSupervisor"
+      deviceToken: "fcmConfiguration/deviceToken"
     })
   }
-  */
 };
 </script>
