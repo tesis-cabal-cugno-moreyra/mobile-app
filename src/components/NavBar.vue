@@ -30,7 +30,7 @@
         >
       </v-list-item>
 
-      <v-list-item link>
+      <v-list-item link v-on:click="editUser">
         <v-list-item-icon>
           <v-icon color="grey darken-1">mdi-settings</v-icon>
         </v-list-item-icon>
@@ -78,6 +78,7 @@
 
 <script>
 import LogoutModal from "@/components/LogoutModal";
+import {mapGetters} from "vuex";
 
 export default {
   name: "NavBar",
@@ -96,11 +97,20 @@ export default {
     },
     openLogoutModal() {
       this.logoutModal = true;
+    },
+    editUser() {
+      this.$store.dispatch("uiParams/hideNavBar");
+
+      this.$store.commit(
+          "uiParams/changeShowEditUserState",
+          !this.showEditUser
+      );
     }
+  },
+  computed: {
+    ...mapGetters({
+      showEditUser: "uiParams/showEditUser",
+    })
   }
 }
 </script>
-
-<style scoped>
-
-</style>

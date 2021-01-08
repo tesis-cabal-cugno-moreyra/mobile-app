@@ -15,6 +15,7 @@ export default {
   },
   updateUser(state, user) {
     state.user.username = user.username;
+    state.user.id = user.id;
     state.user.email = user.email;
     state.user.firstName = user.firstName;
     state.user.lastName = user.lastName;
@@ -24,6 +25,7 @@ export default {
   removeUser(state) {
     localStorage.removeItem("user");
     state.user.username = null;
+    state.user.id = null;
     state.user.email = null;
     state.user.firstName = null;
     state.user.lastName = null;

@@ -93,7 +93,7 @@
           </v-card>
         </v-dialog>
       </v-row>
-<!--      <SignInSupervisor></SignInSupervisor>-->
+      <SignInResource></SignInResource>
     </v-main>
   </v-app>
 </template>
@@ -101,15 +101,15 @@
 <script>
 import { mapGetters } from "vuex";
 import authServices from "@/services/authServices";
-// import SignInSupervisor from "../components/SignInSupervisor.vue";
+ import SignInResource from "../components/SignInResource.vue";
 
 export default {
   name: "Login",
-  /*
+
   components: {
-    SignInSupervisor
+    SignInResource
   },
-  */
+
   data: function() {
     return {
       username: "",
@@ -141,6 +141,7 @@ export default {
 
             let roles = authServices.getRoles();
             let user = {
+              id: response.data.user.id,
               username: response.data.user.username,
               email: response.data.user.email,
               firstName: response.data.user.first_name,
@@ -182,54 +183,53 @@ export default {
 
     async SendConfirm(requiredCode) {
       this.tryToLogin = true;
-      // await this.$store.dispatch("uiParams/turnOnSpinnerOverlay");
-
       if (requiredCode.trim() == "") {
-        // this.$store.commit("uiParams/dispatchAlert", {
-        //   text: "Ingrese un codigo",
-        //   color: "primary"
-        // });
-        // await this.$store.dispatch("uiParams/turnOffSpinnerOverlay");
+         this.$store.commit("uiParams/dispatchAlert", {
+           text: "Ingrese un codigo",
+           color: "primary"
+         });
         this.tryToLogin = false;
         return;
       }
 
-      // await this.$store
-      //   .dispatch("domainConfig/checkDomainAccessCode", {
-      //     domain_code: requiredCode
-      //   })
-      //   .then(async () => {
-      //     this.tryToLogin = false;
-      //     await this.$store.dispatch("uiParams/turnOffSpinnerOverlay");
-      //
-      //     await this.$store.commit("domainConfig/addDomainCode", requiredCode);
-      //
-      //     this.$store.commit(
-      //       "uiParams/changeSignInSupervisorState",
-      //       !this.showSignInSupervisor
-      //     );
-      //
-      //     this.confirmDomain = false;
-      //     this.requiredCode = "";
-      //   })
-      //   .catch(async () => {
-      //     this.tryToLogin = false;
-      //     this.$store.commit("uiParams/dispatchAlert", {
-      //       text: "Codigo incorrecto",
-      //       color: "primary"
-      //     });
-      //   })
-      //   .finally(
-      //     async () =>
-      //       await this.$store.dispatch("uiParams/turnOffSpinnerOverlay"),
-      //     (this.tryToLogin = false)
-      //   );
+       await this.$store
+         .dispatch("domainConfig/checkDomainAccessCode", {
+           domain_code: requiredCode
+         })
+         .then(async () => {
+           this.tryToLogin = false;
+
+           await this.$store.commit("domainConfig/addDomainCode", requiredCode);
+
+           this.$store.commit(
+             "uiParams/changeSignInResourceState",
+             !this.showSignInResource
+           );
+
+           this.confirmDomain = false;
+           this.requiredCode = "";
+         })
+         .catch(async () => {
+           this.tryToLogin = false;
+           this.$store.commit("uiParams/dispatchAlert", {
+             text: "Codigo incorrecto",
+             color: "primary"
+           });
+         })
+         .finally(
+           async () =>
+           (this.tryToLogin = false)
+         );
     }
   },
+
   computed: {
     ...mapGetters({
+      token: "restAuth/accessToken",
+      showSignInResource: "uiParams/showSignInResource",
       deviceToken: "fcmConfiguration/deviceToken"
     })
   }
+
 };
 </script>
