@@ -5,14 +5,11 @@ export default {
   changeNavBarState(state, value) {
     state.showNavBar = value;
   },
-  changeSignInSupervisorState(state, value) {
-    state.showSignInSupervisor = value;
-  },
   changeSignInResourceState(state, value) {
     state.showSignInResource = value;
   },
-  changeSignInAdminState(state, value) {
-    state.showSignInAdmin = value;
+  changeShowEditUserState(state, value) {
+    state.showEditUser = value;
   },
   dispatchAlert(state, payload) {
     state.snackbar.text = payload.text;
