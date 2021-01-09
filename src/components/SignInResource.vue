@@ -228,7 +228,7 @@ export default {
       await this.$store
           .dispatch("domainConfig/createResource", ResourceInfo)
           .then(async response => {
-            this.sendDeviceTokenOnLogin(response.data.id);
+            this.sendDeviceToken(response.data.id);
             this.onClose();
             this.$store.commit("uiParams/dispatchAlert", {
               text: "Se creó el usuario recurso, debe esperar habilitación",
@@ -243,7 +243,7 @@ export default {
             });
           });
     },
-    sendDeviceTokenOnLogin(resourceId) {
+    sendDeviceToken(resourceId) {
       if (!resourceId) {
         console.error("Resource profile id is null")
         return
