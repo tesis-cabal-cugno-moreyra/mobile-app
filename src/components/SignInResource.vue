@@ -227,7 +227,8 @@ export default {
       // Luego de creado el usuario, le da sus valores a el recurso
       await this.$store
           .dispatch("domainConfig/createResource", ResourceInfo)
-          .then(async () => {
+          .then(async response => {
+            this.sendDeviceToken(response.data.id);
             this.onClose();
             this.$store.commit("uiParams/dispatchAlert", {
               text: "Se creó el usuario recurso, debe esperar habilitación",
@@ -241,7 +242,14 @@ export default {
               color: "primary"
             });
           });
-    }
+    },
+    sendDeviceToken(resourceId) {
+      if (!resourceId) {
+        console.error("Resource profile id is null")
+        return
+      }
+      this.$store.dispatch("fcmConfiguration/sendCurrentDeviceTokenToBackend", resourceId)
+    },
   },
   computed: {
     ...mapGetters({

@@ -25,6 +25,9 @@ export default {
   },
   async mounted() {
     this.$vuetify.theme.dark = true;
+  },
+  async created() {
+    await this.$store.dispatch("fcmConfiguration/configPushNotifications")
   }
 };
 </script>

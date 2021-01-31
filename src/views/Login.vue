@@ -133,6 +133,12 @@ export default {
         await this.$store
           .dispatch("restAuth/login", payload)
           .then(response => {
+            if (!authServices.isResource()) {
+              this.loginError = true;
+              this.errorMessage = "¡Ups! Este usuario no tiene un perfil relacionado del tipo Recurso! " +
+                  "Esta app soalemnte permite este tipo de usuarios";
+              return
+            }
             let accessToken = response.data.access_token;
             let refreshToken = response.data.refresh_token;
 
@@ -149,6 +155,7 @@ export default {
               roles: roles
             };
             this.$store.dispatch("restAuth/updateUser", user);
+            this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
             this.$router.push({ name: "Home" });
           })
           .catch(e => {
@@ -166,6 +173,14 @@ export default {
     },
     resetErrors: function() {
       this.loginError = false;
+    },
+
+    sendDeviceTokenOnLogin(resourceId) {
+      if (!resourceId) {
+        console.error("Resource profile id is null")
+        return
+      }
+      this.$store.dispatch("fcmConfiguration/sendCurrentDeviceTokenToBackend", resourceId)
     },
 
     async SendConfirm(requiredCode) {
@@ -214,7 +229,7 @@ export default {
     ...mapGetters({
       token: "restAuth/accessToken",
       showSignInResource: "uiParams/showSignInResource",
-
+      deviceToken: "fcmConfiguration/deviceToken"
     })
   }
 
