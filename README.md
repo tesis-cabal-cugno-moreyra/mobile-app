@@ -4,7 +4,9 @@
 ```
 yarn install
 ```
-
+```
+yarn build
+```
 Update apps structure
 ```
 npx cap sync
