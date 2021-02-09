@@ -17,6 +17,8 @@ Add this, at the root of your repo, with the name `capacitor.config.json`
 {"appId":"com.utn.sicoin","appName":"Sicoin","bundledWebRuntime":false,"webDir":"dist","linuxAndroidStudioPath": "route/to/your/android/studio"}
 ```
 
+And add this [file (google-services.json)](https://drive.google.com/file/d/1fDeJ25KCyH4HZc4ArBVEDiuu62IBrd1e/view?usp=sharing) under the path `android/app`
+
 ### Compiles and hot-reloads for development
 ```
 yarn serve
