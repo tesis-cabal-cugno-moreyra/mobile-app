@@ -133,12 +133,6 @@ export default {
         await this.$store
           .dispatch("restAuth/login", payload)
           .then(response => {
-            if (!authServices.isResource()) {
-              this.loginError = true;
-              this.errorMessage = "¡Ups! Este usuario no tiene un perfil relacionado del tipo Recurso! " +
-                  "Esta app soalemnte permite este tipo de usuarios";
-              return
-            }
             let accessToken = response.data.access_token;
             let refreshToken = response.data.refresh_token;
 
@@ -155,7 +149,16 @@ export default {
               roles: roles
             };
             this.$store.dispatch("restAuth/updateUser", user);
-            this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
+            if (!this.isResource) {
+              this.loginError = true;
+              this.errorMessage = "¡Ups! Este usuario no tiene un perfil relacionado del tipo Recurso!. " +
+                  "Esta app solamente permite este tipo de usuarios.";
+              this.$store.dispatch("restAuth/logout");
+              return
+            }
+            if (response.data.resourceprofile) {
+              this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
+            }
             this.$router.push({ name: "Home" });
           })
           .catch(e => {
@@ -165,7 +168,9 @@ export default {
             } else {
               console.log(e);
               this.loginError = true;
-              this.errorMessage = "Algo salió mal. Prueba de nuevo.";
+              // this.errorMessage = "Algo salió mal. Prueba de nuevo.";
+              this.errorMessage = e;
+              alert(e);
             }
           });
       }
@@ -229,7 +234,8 @@ export default {
     ...mapGetters({
       token: "restAuth/accessToken",
       showSignInResource: "uiParams/showSignInResource",
-      deviceToken: "fcmConfiguration/deviceToken"
+      deviceToken: "fcmConfiguration/deviceToken",
+      isResource: "restAuth/isResource"
     })
   }
 
