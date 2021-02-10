@@ -140,6 +140,7 @@ export default {
             this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
 
             let roles = authServices.getRoles();
+            console.log(roles)
             let user = {
               id: response.data.user.id,
               username: response.data.user.username,
@@ -149,7 +150,7 @@ export default {
               roles: roles
             };
             this.$store.dispatch("restAuth/updateUser", user);
-            if (!this.isResource) {
+            if (!authServices.isResource()) {
               this.loginError = true;
               this.errorMessage = "¡Ups! Este usuario no tiene un perfil relacionado del tipo Recurso!. " +
                   "Esta app solamente permite este tipo de usuarios.";
@@ -234,8 +235,7 @@ export default {
     ...mapGetters({
       token: "restAuth/accessToken",
       showSignInResource: "uiParams/showSignInResource",
-      deviceToken: "fcmConfiguration/deviceToken",
-      isResource: "restAuth/isResource"
+      deviceToken: "fcmConfiguration/deviceToken"
     })
   }
 
