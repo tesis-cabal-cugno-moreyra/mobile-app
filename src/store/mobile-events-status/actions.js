@@ -1,6 +1,7 @@
 
 export default {
   changeNetworkStatus(context, networkStatus) {
+    console.log(networkStatus)
     switch (networkStatus) {
       case "none":
         this.commit("mobileEventsStatus/updateNetworkStatus", "none");
@@ -15,7 +16,9 @@ export default {
         this.commit("mobileEventsStatus/updateNetworkStatus", "cellular");
         break;
       default:
-        console.error("Error on 'changeNetworkStatus': Wrong parameter applicationStatus.")
+        console.error("Error on 'changeNetworkStatus': Wrong parameter applicationStatus.");
+        alert("mobile-events-status error");
+        break;
     }
   },
   changeApplicationStatus(context, applicationStatus){

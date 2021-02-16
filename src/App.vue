@@ -11,7 +11,8 @@
 
 import AlertSnackbar from "@/components/AlertSnackbar.vue";
 import EditUserData from "@/components/EditUserData.vue";
-//import networkServices from "@/services/networkServices";
+import networkServices from "@/services/networkServices";
+
 
 export default {
   name: 'App',
@@ -29,7 +30,7 @@ export default {
   },
   async created() {
     await this.$store.dispatch("fcmConfiguration/configPushNotifications");
-    //networkServices.listenNetworkStatus();
-  }
+    networkServices.listenNetworkStatus();
+  },
 };
 </script>

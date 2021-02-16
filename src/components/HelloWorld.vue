@@ -10,15 +10,20 @@
         ></v-text-field>
         <v-btn class="pa-1 ma-1" @click="saveText">Save</v-btn>
         <v-btn class="pa-1 ma-1" @click="goAbout">Go About</v-btn>
+        <v-text-field
+            :label="this.networkStatus"
+            outlined
+        ></v-text-field>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+  import {mapState} from "vuex";
+
   export default {
     name: 'HelloWorld',
-
     data: () => ({
       inputText: null
     }),
@@ -29,6 +34,11 @@
       goAbout() {
         this.$router.push({name: "About"});
       }
+    },
+    computed: {
+      ...mapState({
+        networkStatus: "mobileEventsStatus/networkStatus",
+      })
     }
   }
 </script>

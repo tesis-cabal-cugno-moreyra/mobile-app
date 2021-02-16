@@ -20,6 +20,7 @@ export default {
     goLogin() {
       this.$router.push({name: 'Login'})
     }
-  }
+  },
+
 }
 </script>
