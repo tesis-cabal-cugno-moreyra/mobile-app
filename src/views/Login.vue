@@ -140,7 +140,6 @@ export default {
             this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
 
             let roles = authServices.getRoles();
-            console.log(roles)
             let user = {
               id: response.data.user.id,
               username: response.data.user.username,
@@ -167,11 +166,10 @@ export default {
               this.loginError = true;
               this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
             } else {
-              console.log(e);
+              console.error(e);
               this.loginError = true;
               // this.errorMessage = "Algo salió mal. Prueba de nuevo.";
               this.errorMessage = e;
-              alert(e);
             }
           });
       }
