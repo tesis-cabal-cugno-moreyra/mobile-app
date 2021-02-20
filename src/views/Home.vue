@@ -2,6 +2,7 @@
   <div class="home">
     <NavBar></NavBar>
     <HelloWorld/>
+    <MobileTestView/>
   </div>
 </template>
 
@@ -9,10 +10,12 @@
 
 import HelloWorld from '@/components/HelloWorld.vue'
 import NavBar from "@/components/NavBar";
+import MobileTestView from "@/components/MobileTestView";
 
 export default {
   name: 'Home',
   components: {
+    MobileTestView,
     HelloWorld,
     NavBar
   },

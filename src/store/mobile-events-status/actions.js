@@ -1,7 +1,6 @@
 
 export default {
   changeNetworkStatus(context, networkStatus) {
-    console.log(networkStatus)
     switch (networkStatus) {
       case "none":
         this.commit("mobileEventsStatus/updateNetworkStatus", "none");
@@ -22,7 +21,7 @@ export default {
     }
   },
   changeApplicationStatus(context, applicationStatus){
-    if (applicationStatus === 'active') {
+       if (applicationStatus === 'active') {
       this.commit("mobileEventsStatus/updateApplicationStatus", "active");
     } else if (applicationStatus === "inactive") {
       this.commit("mobileEventsStatus/updateApplicationStatus", "inactive");
