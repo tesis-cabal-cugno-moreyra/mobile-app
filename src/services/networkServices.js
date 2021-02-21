@@ -1,9 +1,11 @@
 import { Plugins } from '@capacitor/core';
 const { Network } = Plugins;
-import store from '../store'
+//import store from '../store'
+
 
 export default {
   listenNetworkStatus() {
+    let store = this.$store;
     Network.addListener("networkStatusChange", status => {
       alert("Connection type: " + status.connectionType)
       store.dispatch("mobileEventsStatus/changeNetworkStatus", status.connectionType);

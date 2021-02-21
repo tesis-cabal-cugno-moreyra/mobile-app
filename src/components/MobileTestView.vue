@@ -20,7 +20,7 @@
           <v-card-title class="headline">
             App Info
           </v-card-title>
-          <v-card-text>App status: {{ this.token }}</v-card-text>
+          <v-card-text>App status: {{ this.applicationStatus}}</v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12">
@@ -31,7 +31,7 @@
           <v-card-title class="headline">
             Storage Info
           </v-card-title>
-          <v-card-text>Stored points: 0.</v-card-text>
+          <v-card-text>Stored points: {{ this.storageStatus }}.</v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -44,10 +44,7 @@ import { mapState } from 'vuex';
 export default {
 name: "MobileTestView",
   computed: {
-    ...mapState({
-      networkStatus: "mobileEventsStatus/networkStatus",
-      token: "restAuth/accessToken"
-    })
+    ...mapState('mobileEventsStatus', ['networkStatus', 'applicationStatus', 'storageStatus'])
   }
 };
 </script>

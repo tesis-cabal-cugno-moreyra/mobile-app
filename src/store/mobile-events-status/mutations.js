@@ -2,11 +2,14 @@ import Vue from 'vue';
 
 export default {
   updateNetworkStatus(state, networkStatus) {
-    alert("Cambió el estado de la red.")
-    Vue.set(state.networkStatus, networkStatus.key, networkStatus.value);
+    //Vue.set(state.networkStatus, networkStatus.key, networkStatus.value);
+    state.networkStatus = networkStatus
   },
   updateApplicationStatus(state, applicationStatus) {
-    state.applicationStatus = applicationStatus
+    alert(applicationStatus.value);
+    alert(applicationStatus.key);
+    Vue.set(state.applicationStatus, applicationStatus.key, applicationStatus.value);
+    //state.applicationStatus = applicationStatus
   },
   updateStorageStatus(state, storageStatus) {
     state.backgroundTaskStatus = storageStatus
