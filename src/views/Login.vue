@@ -168,7 +168,6 @@ export default {
             } else {
               console.error(e);
               this.loginError = true;
-              // this.errorMessage = "Algo salió mal. Prueba de nuevo.";
               this.errorMessage = e;
             }
           });

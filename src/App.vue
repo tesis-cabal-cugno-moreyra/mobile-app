@@ -29,7 +29,6 @@ export default {
     this.$vuetify.theme.dark = true;
   },
   async created() {
-    console.log("hola!");
     let context = this;
     await this.$store.dispatch("fcmConfiguration/configPushNotifications");
     await networkServices.listenNetworkStatus(context);
