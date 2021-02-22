@@ -3,14 +3,16 @@
     <router-view>
     </router-view>
     <AlertSnackbar></AlertSnackbar>
-<EditUserData></EditUserData>
+    <EditUserData></EditUserData>
   </v-app>
 </template>
 
 <script>
+
 import AlertSnackbar from "@/components/AlertSnackbar.vue";
 import EditUserData from "@/components/EditUserData.vue";
-
+import networkServices from "@/services/networkServices";
+import appServices from "@/services/appServices";
 
 export default {
   name: 'App',
@@ -27,7 +29,10 @@ export default {
     this.$vuetify.theme.dark = true;
   },
   async created() {
-    await this.$store.dispatch("fcmConfiguration/configPushNotifications")
-  }
+    let context = this;
+    await this.$store.dispatch("fcmConfiguration/configPushNotifications");
+    await networkServices.listenNetworkStatus(context);
+    appServices.listenAppStatus(context);
+  },
 };
 </script>
