@@ -16,18 +16,16 @@ export default {
         break;
       default:
         console.error("Error on 'changeNetworkStatus': Wrong parameter applicationStatus.");
-        alert("mobile-events-status error");
         break;
     }
   },
   changeApplicationStatus(context, applicationStatus){
-       if (applicationStatus === 'active') {
-      this.commit("mobileEventsStatus/updateApplicationStatus", "active");
-    } else if (applicationStatus === "inactive") {
-      this.commit("mobileEventsStatus/updateApplicationStatus", "inactive");
-    }
-    else {
-      console.error("Error on 'changeApplicationStatus': Wrong parameter applicationStatus. Accepts only active or inactive.")
+       if (applicationStatus === true) {
+      this.commit("mobileEventsStatus/updateApplicationStatus", true);
+    } else if (applicationStatus === false) {
+      this.commit("mobileEventsStatus/updateApplicationStatus", false);
+    } else {
+      console.error("Error on 'changeApplicationStatus': Wrong parameter applicationStatus. Accepts only true or false.")
     }
   },
   changeStorageStatus(context, storageStatus) {

@@ -20,7 +20,7 @@
           <v-card-title class="headline">
             App Info
           </v-card-title>
-          <v-card-text>App status: {{ this.applicationStatus}}</v-card-text>
+          <v-card-text>App status: {{ this.applicationIsActive }}</v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12">
@@ -44,7 +44,7 @@ import { mapState } from 'vuex';
 export default {
 name: "MobileTestView",
   computed: {
-    ...mapState('mobileEventsStatus', ['networkStatus', 'applicationStatus', 'storageStatus'])
+    ...mapState('mobileEventsStatus', ['networkStatus', 'applicationIsActive', 'storageStatus'])
   }
 };
 </script>

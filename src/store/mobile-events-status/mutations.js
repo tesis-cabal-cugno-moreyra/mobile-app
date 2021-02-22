@@ -4,7 +4,7 @@ export default {
     state.networkStatus = networkStatus
   },
   updateApplicationStatus(state, applicationStatus) {
-    state.applicationStatus = applicationStatus
+    state.applicationIsActive = applicationStatus
   },
   updateStorageStatus(state, storageStatus) {
     state.backgroundTaskStatus = storageStatus

@@ -4,7 +4,7 @@ export default {
     return state.networkStatus;
   },
   applicationStatus(state) {
-    return state.applicationStatus;
+    return state.applicationIsActive;
   },
   storageStatus(state) {
     return state.storageStatus;
