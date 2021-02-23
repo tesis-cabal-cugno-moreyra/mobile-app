@@ -18,7 +18,6 @@
 <script>
   export default {
     name: 'HelloWorld',
-
     data: () => ({
       inputText: null
     }),

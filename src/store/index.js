@@ -7,6 +7,7 @@ import fcmConfiguration from "./fcm-configuration"
 import domainConfig from "./domain-config";
 import uiParams from "./ui-params";
 import incident from "./incident";
+import mobileEventsStatus from "./mobile-events-status"
 
 Vue.use(Vuex)
 
@@ -17,7 +18,7 @@ export default new Vuex.Store({
     fcmConfiguration,
     domainConfig,
     uiParams,
-    incident
-
+    incident,
+  mobileEventsStatus
   }
 });

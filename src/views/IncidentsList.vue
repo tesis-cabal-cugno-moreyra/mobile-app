@@ -17,7 +17,7 @@
           hide-default-footer
       >
         <template v-slot:top>
-          <v-dialog v-model="dialogChangeVisibility" max-width="515px">
+          <v-dialog v-model="dialogChangeVisibility" max-width="350px">
             <v-card>
               <v-card-title class="headline"
               >¿Desea unirse a este incidente?</v-card-title
@@ -29,7 +29,7 @@
                     outlined
                     @click="enterToIncident()"
                     :class="['mr-5']"
-                >Cambiar</v-btn
+                >Ingresar</v-btn
                 >
                 <v-btn
                     color="primary"
@@ -50,7 +50,7 @@
                   v-on="on"
                   small
                   color="red"
-                  @click="openDialogacceptance(item)"
+                  @click="openDialogAcceptance(item)"
                   :class="['mr-2']"
               >
                 mdi-fire
@@ -152,11 +152,6 @@ export default {
       };
 
       if (
-       //   searchInfo.incident_type__name !==
-         // this.referenceSearch.incident_type__name ||
-     //     searchInfo.visibility !== this.referenceSearch.visibility ||
-        //  searchInfo.status !== this.referenceSearch.status ||
-         // searchInfo.data_status !== this.referenceSearch.data_status ||
           searchInfo.alias__alias !== this.referenceSearch.alias__alias
       ) {
         this.page = 1;
@@ -198,20 +193,21 @@ export default {
 
       this.numberOfPage = Math.ceil(completeData.data.count / itemsPerPage);
     },
-    openDialogacceptance(incidentSelected){
+    openDialogAcceptance(incidentSelected){
       this.incidentSelected = incidentSelected;
       this.dialogChangeVisibility = true;
     },
   async  enterToIncident(){
-    console.log(this.incidentSelected)
+      console.log()
     let information = {
-      incident_id: this.incidentSelected.id,
-      user_id: this.userInformation.id,
+      incidentId: this.incidentSelected.id,
+      resourceId: this.userInformation.id,
     };
       await this.$store
-          .dispatch("incident/postIncidentResource", information)
+          .dispatch("incident/postResourceIncident", information)
           .then(response => {
             console.log(response);
+            this.$router.push({ name: "OngoingIncident" });
 
           })
           .catch(async () => {
@@ -221,6 +217,10 @@ export default {
                 color: "primary",
                 timeout: 4000
               });
+
+            //de momento no puedo unirme a un incidente ya que no puedo iniciar sesion esto se tiene que quitar despues
+            this.$router.push({ name: "OngoingIncident" });
+
 
             this.loadingTable = false;
             await this.$store.dispatch("uiParams/turnOffSpinnerOverlay");
