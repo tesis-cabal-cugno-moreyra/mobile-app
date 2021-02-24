@@ -140,7 +140,9 @@ export default {
             this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
 
             let roles = authServices.getRoles();
+
             let user = {
+              resourceId: response.data.user.resourceprofile.id,
               id: response.data.user.id,
               username: response.data.user.username,
               email: response.data.user.email,

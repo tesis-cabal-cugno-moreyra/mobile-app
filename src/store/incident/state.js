@@ -1,8 +1,7 @@
 export default {
-  /*
-  resourceSelectedInfo: {
-    state: false,
-    incidentId: null,
-    statusSelected: ""
-  }*/
+    incidentUserData: {
+        resourceId: localStorage.getItem("resourceId"),
+        incidentId: localStorage.getItem("incidentId"),
+
+    }
 };

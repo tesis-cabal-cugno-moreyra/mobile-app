@@ -24,6 +24,20 @@ export default {
     });
   },
 
+  deleteResourceIncident(context, payload) {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      try {
+        let urlResourceIncident = `/api/v1/incidents/${payload.incidentId}/resources/${payload.resourceId}/`;
+        return resolve(await api.delete(urlResourceIncident));
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  },
+  updateIncidentUserData(context, information) {
+    this.commit("incident/updateIncidentUserData", information);
+  }
   /*
   createIncident(context, payload) {
     // eslint-disable-next-line no-async-promise-executor
@@ -95,17 +109,7 @@ export default {
     });
   },
 
-  deleteResourceIncident(context, payload) {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
-      try {
-        let urlResourceIncident = `/api/v1/incidents/${payload.incidentId}/resources/${payload.resourceId}/`;
-        return resolve(await api.delete(urlResourceIncident));
-      } catch (e) {
-        return reject(e);
-      }
-    });
-  },
+
   getIncidentTrackPoints(context, payload) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {

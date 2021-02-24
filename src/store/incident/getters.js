@@ -1,6 +1,5 @@
 export default {
-  /*
-  resourceSelectedInfo(state) {
-    return state.resourceSelectedInfo;
-  }*/
+    incidentUserData(state) {
+        return state.incidentUserData;
+    },
 };

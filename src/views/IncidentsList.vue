@@ -1,5 +1,6 @@
 <template>
   <v-card>
+    <nav-bar></nav-bar>
     <v-card-title :class="['pa-3', 'mt-5']">
       <v-col cols="12">
         {{ `${"Incidentes en transcurso  "}  ` }}<v-icon> mdi-truck-fast</v-icon>
@@ -72,9 +73,10 @@
 
 <script>
 import { mapGetters } from "vuex";
+import NavBar from "@/components/NavBar";
 export default {
   name: "ActiveIncidents",
-
+  components: {NavBar},
   data: function() {
     return {
       showIncidentResourceList: false,
@@ -102,9 +104,11 @@ export default {
       },
       headersIncident: [
         {
-          text: "Referencia de Ubicación",
+          text: "Referencia",
           sortable: false,
-          value: "location_as_string_reference"
+       //   value: "location_as_string_reference"
+             value: "reference"
+
         },
         {
           text: "Acciones",
@@ -117,7 +121,6 @@ export default {
   },
   async created() {
     await this.searchIncident();
-   // await this.createTypeIncidentTypeList();
   },
   watch: {
     page() {
@@ -184,7 +187,6 @@ export default {
           });
     },
     loadIncidentData(completeData) {
-    //this.translate(completeData.data.results);
       this.userIncidentData = completeData.data.results
       let itemsPerPage = process.env.VUE_APP_ITEMS_PER_PAGE;
       if (!itemsPerPage) {
@@ -198,15 +200,14 @@ export default {
       this.dialogChangeVisibility = true;
     },
   async  enterToIncident(){
-      console.log()
-    let information = {
+    let incidentInformation = {
       incidentId: this.incidentSelected.id,
-      resourceId: this.userInformation.id,
+      resourceId: this.userInformation.resourceId,
     };
+    await this.$store.dispatch("incident/updateIncidentUserData", incidentInformation);
       await this.$store
-          .dispatch("incident/postResourceIncident", information)
-          .then(response => {
-            console.log(response);
+          .dispatch("incident/postResourceIncident", incidentInformation)
+          .then(() => {
             this.$router.push({ name: "OngoingIncident" });
 
           })
@@ -217,10 +218,6 @@ export default {
                 color: "primary",
                 timeout: 4000
               });
-
-            //de momento no puedo unirme a un incidente ya que no puedo iniciar sesion esto se tiene que quitar despues
-            this.$router.push({ name: "OngoingIncident" });
-
 
             this.loadingTable = false;
             await this.$store.dispatch("uiParams/turnOffSpinnerOverlay");
@@ -237,18 +234,10 @@ export default {
   computed: {
     ...mapGetters({
       domainConfig: "domainConfig/domainConfig",
-      userInformation: "restAuth/user"
+      userInformation: "restAuth/user",
+      userInformation2: "incident/incidentUserData"
     })
   }
-  /*async changeStatusIncident(status) {
-    this.dialogChangeStatus = false;
-    this.loadingTable = true;
-    await this.$store.dispatch("uiParams/turnOnSpinnerOverlay");
-   /* let incidentInfo = {
-      incidentId: this.incidentSelected.id,
-      incidentChangeStatus: status
-    };
-  },*/
 
 
 
