@@ -3,8 +3,8 @@ export default {
     let object = {
       type: "map_point",
       data: {
-        lat: mapPoint.getPoint().getLat(),
-        long: mapPoint.getPoint().getLng(),
+        lat: mapPoint.getLat(),
+        long: mapPoint.getLng(),
         message: mapPoint.getComment()
       }
     }

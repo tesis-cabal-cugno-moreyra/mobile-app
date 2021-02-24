@@ -1,6 +1,6 @@
 export class Point {
   constructor(coordinates) {
-    this.coordinates = coordinates; // This must be an array.
+    this.coordinates = coordinates; // Se almacena el objeto coords obtenido al obtener la ubicación.
     this.type = "Point";
   }
   getCoordinates() {
@@ -8,14 +8,14 @@ export class Point {
   }
   getLng() {
     if(this.coordinates !== null) {
-      return this.coordinates[0];
+      return this.coordinates.longitude;
     } else {
       return 0;
     }
   }
   getLat() {
     if(this.coordinates !== null) {
-      return this.coordinates[1];
+      return this.coordinates.latitude;
     } else {
       return 0;
     }

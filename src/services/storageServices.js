@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Plugins } from '@capacitor/core';
+import {MapPoint} from "@/domain/MapPoint";
 const { Storage } = Plugins;
 
 export default {
@@ -15,7 +16,8 @@ export default {
   },
   async getMapPoint(mapPointKey) {
     const mapPoint = await Storage.get({ key: mapPointKey});
-    return JSON.parse(mapPoint.value);
+    return Object.assign(new MapPoint, JSON.parse(mapPoint.value));
+    //return JSON.parse(mapPoint.value);
   },
   async removeMapPoint(mapPointKey) {
     await Storage.remove({ key: mapPointKey})
@@ -33,4 +35,7 @@ export default {
   async removeTrackPoint(trackPointKey) {
     await Storage.remove({ key: trackPointKey})
   },
+  async clear() {
+    await Storage.clear();
+  }
 };
