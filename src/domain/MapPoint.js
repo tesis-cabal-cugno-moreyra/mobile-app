@@ -1,4 +1,4 @@
-import Point from "./"
+import { Point } from "@/domain/Point"
 
 export class MapPoint {
   constructor(coordinates, resourceId, comment) {
