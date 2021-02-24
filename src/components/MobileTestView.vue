@@ -57,6 +57,9 @@
 
 <script>
 import { mapState } from 'vuex';
+import geolocationServices from "@/services/geolocationServices";
+import storageServices from "@/services/storageServices";
+import { MapPoint } from "@/domain/MapPoint"
 
 export default {
 name: "MobileTestView",
@@ -67,11 +70,27 @@ name: "MobileTestView",
     tryToSendPoint() {
       console.log("try to send point!");
     },
-    storePoint() {
+    async storePoint() {
+
+      let currentPosition = await geolocationServices.getCurrentPosition();
+      let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
+      await storageServices.setMapPoint(mapPoint);
       console.log("point stored!");
+      // Obtener la geolocalización, instanciar la clase correspondiente y almacenarla.
     },
     sendPoint() {
+      //let currentPosition = await geolocationServices.getCurrentPosition();
+      //let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
+      const ws = new WebSocket('wss://tesis-cabal-cugno-moreyra-back.herokuapp.com/ws/incident/1/');
+      ws.onopen = function () {
+        let data = JSON.stringify({"type": "map_point", "data": {"lat": "12", "long": "23", "message": "Beep beep!"}})
+        ws.send(data);
+      };
+      ws.onclose = function() {
+        console.error("Websocket closed!");
+      }
       console.log("network it's OK, point must be sended!");
+      // Obtener la geolocalización, instanciar la clase correspondiente y enviarla.
     }
   }
 
