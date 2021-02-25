@@ -60,7 +60,7 @@ import { mapState } from 'vuex';
 import geolocationServices from "@/services/geolocationServices";
 import storageServices from "@/services/storageServices";
 import { MapPoint } from "@/domain/MapPoint"
-import websocketAdapters from "@/adapters/websocketAdapters";
+import webSocketServices from "@/services/webSocketServices";
 
 export default {
 name: "MobileTestView",
@@ -68,15 +68,33 @@ name: "MobileTestView",
     ...mapState('mobileEventsStatus', ['networkStatus', 'applicationIsActive', 'storedPointsCounter'])
   },
   methods: {
-    tryToSendPoint() {
+    async tryToSendPoint() {
       console.log("try to send point!");
+      console.log(this.networkStatus);
+      if (this.networkStatus === 'wifi' || this.networkStatus === 'cellular') {
+        let keys = await storageServices.getKeys()
+        if (keys) {
+          for (let key in keys) {
+            let mapPoint = await storageServices.getMapPoint(key);
+            await storageServices.removeMapPoint(key, this);
+            webSocketServices.sendMapPoint(mapPoint);
+          }
+          let currentPosition = await geolocationServices.getCurrentPosition();
+          let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
+          webSocketServices.sendMapPoint(mapPoint);
+        }
+      } else {
+        let currentPosition = await geolocationServices.getCurrentPosition();
+        let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
+        await storageServices.setMapPoint(mapPoint, this);
+      }
     },
     async storePoint() {
       await storageServices.clear();
 
       let currentPosition = await geolocationServices.getCurrentPosition();
       let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
-      await storageServices.setMapPoint(mapPoint);
+      await storageServices.setMapPoint(mapPoint, this);
 
       console.log(mapPoint);
       console.log("point stored!");
@@ -87,29 +105,14 @@ name: "MobileTestView",
       mapPoint = await storageServices.getMapPoint(keys[0]);
       console.log(mapPoint);
 
-      let data = websocketAdapters.mapPointAdapter(mapPoint);
-      const ws = new WebSocket('wss://tesis-cabal-cugno-moreyra-back.herokuapp.com/ws/incident/1/');
-      ws.onopen = function () {
-        ws.send(data);
-      };
-      ws.onclose = function() {
-        console.error("Websocket closed!");
-      }
+      webSocketServices.sendMapPoint(mapPoint);
 
       // Obtener la geolocalización, instanciar la clase correspondiente y almacenarla.
     },
-    sendPoint() {
-      //let currentPosition = await geolocationServices.getCurrentPosition();
-      //let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
-      const ws = new WebSocket('wss://tesis-cabal-cugno-moreyra-back.herokuapp.com/ws/incident/1/');
-      ws.onopen = function () {
-        let data = JSON.stringify({"type": "map_point", "data": {"lat": "12", "long": "23", "message": "Beep beep!"}})
-        ws.send(data);
-      };
-      ws.onclose = function() {
-        console.error("Websocket closed!");
-      }
-      console.log("network it's OK, point must be sended!");
+    async sendPoint() {
+      let currentPosition = await geolocationServices.getCurrentPosition();
+      let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
+      webSocketServices.sendMapPoint(mapPoint);
       // Obtener la geolocalización, instanciar la clase correspondiente y enviarla.
     }
   }
