@@ -31,5 +31,8 @@ export default {
   increaseByOneStoredPointsCounter() {
       this.commit("mobileEventsStatus/increaseStoredPointsCounter", 1);
       // TODO: Implementar junto con websocket, coordinar el objeto a almacenar para facilitar el manejo de los datos.
+  },
+  decreaseByOneStoredPointsCounter() {
+    this.commit("mobileEventsStatus/increaseStoredPointsCounter", -1);
   }
 };
