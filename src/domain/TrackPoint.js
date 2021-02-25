@@ -1,14 +1,11 @@
-import Point from "./"
+import { Point } from "@/domain/Point"
 
-export class TrackPoint {
+export class TrackPoint extends Point {
   constructor(coordinates, resourceId) {
-    this.point = new Point(coordinates);
+    super(coordinates);
     this.collectedAt = new Date();
     this.internalType = "TrackPoint";
     this.resourceId = resourceId;
-  }
-  getPoint(){
-    return this.point;
   }
   getCollectedAt(){
     return this.collectedAt;

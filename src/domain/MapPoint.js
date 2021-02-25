@@ -2,7 +2,7 @@ import { Point } from "@/domain/Point"
 
 export class MapPoint extends Point {
   constructor(coordinates, resourceId, comment) {
-    super(coordinates)
+    super(coordinates);
     this.collectedAt = new Date();
     this.internalType = "MapPoint"
     this.resourceId = resourceId
