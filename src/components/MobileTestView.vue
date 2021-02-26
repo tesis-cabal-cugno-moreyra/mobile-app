@@ -1,6 +1,6 @@
 <template>
     <v-container>
-    <v-row dense>
+    <v-row dense class="pt-4 mt-4">
       <v-col cols="12">
         <v-card
             color="#103f79"
@@ -36,7 +36,9 @@
             <v-btn
                 color="#f3b229"
                 text
-                v-on:click="sendPoint()"
+                v-on:click="tryToSendPoint()"
+                :loading="sendingPoint"
+                :disabled="sendingPointDisable"
             >
               Enviar Point
             </v-btn>
@@ -45,6 +47,8 @@
                 color="#f3b229"
                 text
                 v-on:click="storePoint()"
+                :loading="storingPoint"
+                :disabled="storingPointDisable"
             >
               Almacenar Point
             </v-btn>
@@ -60,6 +64,7 @@ import { mapState } from 'vuex';
 import geolocationServices from "@/services/geolocationServices";
 import storageServices from "@/services/storageServices";
 import { MapPoint } from "@/domain/MapPoint"
+import { TrackPoint } from "@/domain/TrackPoint";
 import webSocketServices from "@/services/webSocketServices";
 
 export default {
@@ -67,53 +72,52 @@ name: "MobileTestView",
   computed: {
     ...mapState('mobileEventsStatus', ['networkStatus', 'applicationIsActive', 'storedPointsCounter'])
   },
+  data() {
+    return {
+      storingPoint: false,
+      storingPointDisable : false,
+      sendingPoint: false,
+      sendingPointDisable: false
+    }
+  },
   methods: {
     async tryToSendPoint() {
-      console.log("try to send point!");
-      console.log(this.networkStatus);
+      this.sendingPoint = true;
+      this.sendingPointDisable = true;
+      this.storingPointDisable = true;
       if (this.networkStatus === 'wifi' || this.networkStatus === 'cellular') {
         let keys = await storageServices.getKeys()
-        if (keys) {
-          for (let key in keys) {
-            let mapPoint = await storageServices.getMapPoint(key);
-            await storageServices.removeMapPoint(key, this);
-            webSocketServices.sendMapPoint(mapPoint);
+        if (keys.length > 0) {
+          for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            let point = await storageServices.getPoint(key);
+            await storageServices.removePoint(key, this);
+            await webSocketServices.sendPoint(point);
           }
-          let currentPosition = await geolocationServices.getCurrentPosition();
-          let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
-          webSocketServices.sendMapPoint(mapPoint);
         }
+        let currentPosition = await geolocationServices.getCurrentPosition();
+        let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket " + this.storedPointsCounter);
+        webSocketServices.sendPoint(mapPoint);
       } else {
         let currentPosition = await geolocationServices.getCurrentPosition();
-        let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
-        await storageServices.setMapPoint(mapPoint, this);
+        let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket " + this.storedPointsCounter);
+        await storageServices.setPoint(mapPoint, this);
       }
+      this.sendingPoint = false;
+      this.sendingPointDisable = false;
+      this.storingPointDisable = false;
     },
     async storePoint() {
-      await storageServices.clear();
-
+      this.storingPoint = true;
+      this.storingPointDisable = true;
+      this.sendingPointDisable = true;
+      //await storageServices.clear(this);
       let currentPosition = await geolocationServices.getCurrentPosition();
-      let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
-      await storageServices.setMapPoint(mapPoint, this);
-
-      console.log(mapPoint);
-      console.log("point stored!");
-
-      let keys = await storageServices.getKeys();
-      console.log(keys);
-
-      mapPoint = await storageServices.getMapPoint(keys[0]);
-      console.log(mapPoint);
-
-      webSocketServices.sendMapPoint(mapPoint);
-
-      // Obtener la geolocalización, instanciar la clase correspondiente y almacenarla.
-    },
-    async sendPoint() {
-      let currentPosition = await geolocationServices.getCurrentPosition();
-      let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket");
-      webSocketServices.sendMapPoint(mapPoint);
-      // Obtener la geolocalización, instanciar la clase correspondiente y enviarla.
+      let trackPoint = new TrackPoint(currentPosition.coords, 1);
+      await storageServices.setPoint(trackPoint, this);
+      this.storingPoint = false;
+      this.storingPointDisable = false;
+      this.sendingPointDisable = false;
     }
   }
 
