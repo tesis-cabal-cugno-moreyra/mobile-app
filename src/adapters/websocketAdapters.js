@@ -12,12 +12,22 @@ export default {
   },
   trackPointAdapter(trackPoint) {
     let object = {
-      type: "map_point",
+      type: "track_point",
       data: {
-        lat: trackPoint.getPoint().getLat(),
-        long: trackPoint.getPoint().getLng(),
+        lat: trackPoint.getLat(),
+        long: trackPoint.getLng(),
       }
     }
     return JSON.stringify(object)
+  },
+  pointAdapter(point) {
+    if (point.internalType === "MapPoint") {
+      return this.mapPointAdapter(point);
+    } else if (point.internalType === "TrackPoint") {
+      return this.trackPointAdapter(point);
+    } else {
+      console.error("Point can't be adapted. Only MapPoint or TrackPoint can be.")
+      return null;
+    }
   }
 }
