@@ -8,5 +8,8 @@ export default {
   },
   increaseStoredPointsCounter(state, increaseCounter) {
     state.storedPointsCounter = state.storedPointsCounter + increaseCounter;
+  },
+  resetStoredPointsCounter(state) {
+    state.storedPointsCounter = 0;
   }
 };
