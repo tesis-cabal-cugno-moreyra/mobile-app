@@ -5,6 +5,32 @@ import {TrackPoint} from "@/domain/TrackPoint";
 const { Storage } = Plugins;
 
 export default {
+  async setAccessToken(accessToken) {
+    await Storage.set({
+      key: "access-token",
+      value: JSON.stringify(accessToken)
+    })
+  },
+  async setRefreshToken(refreshToken) {
+    await Storage.set({
+      key: "refresh-token",
+      value: JSON.stringify(refreshToken)
+    })
+  },
+  async getAccessToken() {
+    let accessToken = await Storage.get({ key: 'access-token'});
+    return JSON.parse(accessToken.value);
+  },
+  async getRefreshToken() {
+    let refreshToken = await Storage.get({ key: 'refresh-token'});
+    return JSON.parse(refreshToken.value);
+  },
+  async removeAccessToken() {
+    await Storage.remove({ key: 'access-token'})
+  },
+  async removeRefreshToken() {
+    await Storage.remove({ key: 'refresh-token'})
+  },
   async getKeys() {
     const { keys } = await Storage.keys()
     return keys;
