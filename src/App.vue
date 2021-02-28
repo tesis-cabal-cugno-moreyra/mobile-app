@@ -13,6 +13,8 @@ import AlertSnackbar from "@/components/AlertSnackbar.vue";
 import EditUserData from "@/components/EditUserData.vue";
 import networkServices from "@/services/networkServices";
 import appServices from "@/services/appServices";
+import authServices from "@/services/authServices";
+import storageServices from "@/services/storageServices";
 
 export default {
   name: 'App',
@@ -25,8 +27,15 @@ export default {
       logoutModal: false
     };
   },
-  async mounted() {
-    this.$vuetify.theme.dark = true;
+  async beforeCreate() {
+    await authServices.syncStorages();
+    if (authServices.tokenIsExpired()) {
+      let refreshToken = await storageServices.getRefreshToken();
+      await this.$store.dispatch("restAuth/renewToken", refreshToken).then(response => {
+        storageServices.setAccessToken(response.data.access);
+        localStorage.setItem("access-token", response.data.access)
+      })
+    }
   },
   async created() {
     let context = this;
@@ -34,5 +43,8 @@ export default {
     await networkServices.listenNetworkStatus(context);
     appServices.listenAppStatus(context);
   },
+  async mounted() {
+    this.$vuetify.theme.dark = true;
+  }
 };
 </script>
