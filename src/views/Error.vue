@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     goIncidentView() {
-      this.$router.push({ name: "IncidentsView" });
+      this.$router.push({ name: "ActiveIncidents" });
     }
   }
 };

@@ -1,4 +1,5 @@
 import { ROLES } from "@/constants/roles.js";
+import storageServices from "@/services/storageServices";
 
 export default {
   parseJwt() {
@@ -94,5 +95,11 @@ export default {
   },
   userStored() {
     return localStorage.getItem("user") ? true : false;
+  },
+  async syncStorages() {
+    let accessToken = await storageServices.getAccessToken();
+    localStorage.setItem("access-token", accessToken);
+    let refreshToken = await storageServices.getRefreshToken();
+    localStorage.setItem("refresh-token", refreshToken);
   }
 };

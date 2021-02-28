@@ -2,6 +2,7 @@ export default {
   accessToken: localStorage.getItem("access-token"),
   refreshToken: localStorage.getItem("refresh-token"),
   user: {
+    resourceId: localStorage.getItem("user.resourceprofile.id"),
     id: localStorage.getItem("user.id"),
     username: localStorage.getItem("user.username"),
     email: localStorage.getItem("user.email"),

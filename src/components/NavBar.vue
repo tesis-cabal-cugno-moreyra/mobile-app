@@ -21,15 +21,6 @@
         >
       </v-list-item>
 
-      <v-list-item link>
-        <v-list-item-icon>
-          <v-icon color="grey darken-1">mdi-settings</v-icon>
-        </v-list-item-icon>
-        <v-list-item-title class="grey--text text--darken-1"
-        >Código de Acceso</v-list-item-title
-        >
-      </v-list-item>
-
       <v-list-item link v-on:click="editUser">
         <v-list-item-icon>
           <v-icon color="grey darken-1">mdi-settings</v-icon>
@@ -38,6 +29,16 @@
         >Configuración</v-list-item-title
         >
       </v-list-item>
+
+      <v-list-item link v-on:click="incidentList">
+        <v-list-item-icon>
+          <v-icon color="grey darken-1">mdi-clipboard-text</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title class="grey--text text--darken-1"
+        >Listado de incidentes</v-list-item-title
+        >
+      </v-list-item>
+
 
       <v-switch
           class="ml-4"
@@ -105,6 +106,9 @@ export default {
           "uiParams/changeShowEditUserState",
           !this.showEditUser
       );
+    },
+    incidentList(){
+      this.$router.push({ name: "ActiveIncidents" });
     }
   },
   computed: {
