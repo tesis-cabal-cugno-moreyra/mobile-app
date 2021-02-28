@@ -7,6 +7,8 @@ import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import About from '../views/About.vue'
 import Error from '../views/Error.vue'
+import IncidentsList from '../views/IncidentsList.vue'
+import OngoingIncident from '../views/OngoingIncident.vue'
 
 Vue.use(VueRouter)
 
@@ -29,6 +31,28 @@ const routes = [
       is_admin: true,
       is_supervisor: true,
       is_resource: true
+    }
+  },
+  {
+    path: '/ActiveIncidents',
+    name: 'ActiveIncidents',
+    component: IncidentsList,
+    meta: {
+     //requires_auth: true,
+      //is_admin: true,
+      //is_supervisor: true,
+      //is_resource: true
+    }
+  },
+  {
+    path: '/OngoingIncident',
+    name: 'OngoingIncident',
+    component: OngoingIncident,
+    meta: {
+      //requires_auth: true,
+      //is_admin: true,
+      //is_supervisor: true,
+      //is_resource: true
     }
   },
   {
