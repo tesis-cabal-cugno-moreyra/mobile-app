@@ -1,15 +1,21 @@
+import storageServices from "@/services/storageServices";
+
 export default {
   updateAccessToken(state, newToken) {
+    storageServices.setAccessToken(newToken);
     localStorage.setItem("access-token", newToken);
     state.accessToken = newToken;
   },
   updateRefreshToken(state, newToken) {
+    storageServices.setRefreshToken(newToken)
     localStorage.setItem("refresh-token", newToken);
     state.refreshToken = newToken;
   },
   removeToken(state) {
+    storageServices.removeAccessToken();
     localStorage.removeItem("access-token");
     state.accessToken = null;
+    storageServices.removeRefreshToken();
     localStorage.removeItem("refresh-token");
     state.refreshToken = null;
   },
