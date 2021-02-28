@@ -23,5 +23,18 @@ export default {
   },
   updateUser(context, user) {
     this.commit("restAuth/updateUser", user);
+  },
+  renewToken(context, refreshToken) {
+    let payload = {
+      refresh: refreshToken
+    }
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      try {
+        return resolve(await api.post("/rest-auth/token/refresh/", payload));
+      } catch (e) {
+        return reject(e);
+      }
+    });
   }
 };
