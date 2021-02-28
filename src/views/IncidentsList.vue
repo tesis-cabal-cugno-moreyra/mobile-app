@@ -1,10 +1,8 @@
 <template>
   <v-card>
     <nav-bar></nav-bar>
-    <v-card-title :class="['pa-3', 'mt-5']">
-      <v-col cols="12">
-        {{ `${"Incidentes en transcurso  "}  ` }}<v-icon> mdi-truck-fast</v-icon>
-      </v-col>
+    <v-card-title :class="['justify-center','pa-2', 'mt-9']">
+     <p > Incidentes en transcurso<v-icon> mdi-truck-fast</v-icon></p>
     </v-card-title>
     <v-card-text :class="['pa-1']">
       <v-data-table
@@ -16,6 +14,7 @@
           item-key="id"
           :class="['pb-1']"
           hide-default-footer
+          mobile-breakpoint="0"
       >
         <template v-slot:top>
           <v-dialog v-model="dialogChangeVisibility" max-width="350px">
@@ -46,16 +45,18 @@
         <template v-slot:item.actions="{ item }">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-icon
-                  v-bind="attrs"
-                  v-on="on"
-                  small
-                  color="red"
+              <v-btn
                   @click="openDialogAcceptance(item)"
-                  :class="['mr-2']"
+                v-bind="attrs"
+                v-on="on"
+                color="primary"
+                  small
               >
-                mdi-fire
-              </v-icon>
+                unirme
+              <v-icon>
+                  mdi-fire
+                </v-icon>
+              </v-btn>
             </template>
             <span>Unirme al incidente</span>
           </v-tooltip>
@@ -106,7 +107,6 @@ export default {
         {
           text: "Referencia",
           sortable: false,
-       //   value: "location_as_string_reference"
              value: "reference"
 
         },
@@ -195,21 +195,25 @@ export default {
 
       this.numberOfPage = Math.ceil(completeData.data.count / itemsPerPage);
     },
+
     openDialogAcceptance(incidentSelected){
       this.incidentSelected = incidentSelected;
       this.dialogChangeVisibility = true;
+      console.log(this.incidentSelected.id);
+      console.log(this.userInformation.resourceId);
     },
+
   async  enterToIncident(){
     let incidentInformation = {
       incidentId: this.incidentSelected.id,
       resourceId: this.userInformation.resourceId,
     };
-    await this.$store.dispatch("incident/updateIncidentUserData", incidentInformation);
       await this.$store
           .dispatch("incident/postResourceIncident", incidentInformation)
-          .then(() => {
-            this.$router.push({ name: "OngoingIncident" });
+          .then(async () => {
+            await this.$store.dispatch("incident/updateIncidentUserData", incidentInformation);
 
+            await this.$router.push({ name: "OngoingIncident" });
           })
           .catch(async () => {
 
@@ -220,13 +224,10 @@ export default {
               });
 
             this.loadingTable = false;
-            await this.$store.dispatch("uiParams/turnOffSpinnerOverlay");
           })
           .finally(async () => {
-            await this.$store.dispatch("uiParams/turnOffSpinnerOverlay");
             this.loadingTable = false;
           });
-
     }
     ,
   },
