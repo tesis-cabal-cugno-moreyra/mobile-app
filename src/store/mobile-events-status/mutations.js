@@ -1,12 +1,15 @@
 
 export default {
   updateNetworkStatus(state, networkStatus) {
-    state.networkStatus = networkStatus
+    state.networkStatus = networkStatus;
   },
   updateApplicationStatus(state, applicationStatus) {
-    state.applicationIsActive = applicationStatus
+    state.applicationIsActive = applicationStatus;
   },
-  updateStorageStatus(state, storageStatus) {
-    state.backgroundTaskStatus = storageStatus
+  increaseStoredPointsCounter(state, increaseCounter) {
+    state.storedPointsCounter = state.storedPointsCounter + increaseCounter;
+  },
+  resetStoredPointsCounter(state) {
+    state.storedPointsCounter = 0;
   }
 };

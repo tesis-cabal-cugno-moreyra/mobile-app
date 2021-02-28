@@ -20,16 +20,19 @@ export default {
     }
   },
   changeApplicationStatus(context, applicationStatus){
-       if (applicationStatus === true) {
-      this.commit("mobileEventsStatus/updateApplicationStatus", true);
-    } else if (applicationStatus === false) {
-      this.commit("mobileEventsStatus/updateApplicationStatus", false);
+    if (applicationStatus === true || applicationStatus === false) {
+      this.commit("mobileEventsStatus/updateApplicationStatus", applicationStatus);
     } else {
       console.error("Error on 'changeApplicationStatus': Wrong parameter applicationStatus. Accepts only true or false.")
     }
   },
-  changeStorageStatus(context, storageStatus) {
-      console.log(storageStatus);
-      // TODO: Implementar junto con websocket, coordinar el objeto a almacenar para facilitar el manejo de los datos.
+  increaseByOneStoredPointsCounter() {
+      this.commit("mobileEventsStatus/increaseStoredPointsCounter", 1);
+  },
+  decreaseByOneStoredPointsCounter() {
+    this.commit("mobileEventsStatus/increaseStoredPointsCounter", -1);
+  },
+  resetStoredPointsCounter() {
+    this.commit("mobileEventsStatus/resetStoredPointsCounter");
   }
 };
