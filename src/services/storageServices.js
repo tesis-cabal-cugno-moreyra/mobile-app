@@ -33,6 +33,19 @@ export default {
   },
   async getKeys() {
     const { keys } = await Storage.keys()
+
+    // Remove access token key
+    let accessTokenIndex = keys.indexOf("access-token");
+    if (accessTokenIndex > -1) {
+      keys.splice(accessTokenIndex, 1);
+    }
+
+    // Remove refresh token key
+    let refreshTokenIndex = keys.indexOf("refresh-token");
+    if (refreshTokenIndex > -1) {
+      keys.splice(refreshTokenIndex, 1);
+    }
+
     return keys;
   },
   async setPoint(point, vueContext) {
