@@ -56,7 +56,8 @@ name: "OngoingIncident",
 },
   computed: {
     ...mapGetters({
-      userInformation: "incident/incidentUserData"
+      userInformation: "incident/incidentUserData",
+      resourceIdIncidentId: "incident/incidentUserData"
 
     })
   }

@@ -85,7 +85,7 @@
               <v-btn
                 color="primary"
                 text
-                v-on:click="(confirmDomain = false), (requiredCode = '')"
+                v-on:click="(confirmDomain = false); (requiredCode = '')"
               >
                 Cancelar
               </v-btn>
@@ -118,7 +118,8 @@ export default {
       loginError: false,
       errorMessage: "",
       confirmDomain: false,
-      requiredCode: ""
+      requiredCode: "",
+      resource_id: ""
     };
   },
   methods: {
@@ -140,6 +141,7 @@ export default {
             this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
 
             let roles = authServices.getRoles();
+            this.resource_id =response.data.user.resourceprofile.id;
 
             let user = {
               resourceId: response.data.user.resourceprofile.id,
@@ -161,7 +163,7 @@ export default {
             if (response.data.resourceprofile) {
               this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
             }
-            this.$router.push({ name: "Home" });
+            this.redirectToHomePage();
           })
           .catch(e => {
             if (e.status === 400 && e.statusText === "Bad Request") {
@@ -190,7 +192,7 @@ export default {
 
     async SendConfirm(requiredCode) {
       this.tryToLogin = true;
-      if (requiredCode.trim() == "") {
+      if (requiredCode.trim() === "") {
          this.$store.commit("uiParams/dispatchAlert", {
            text: "Ingrese un codigo",
            color: "primary"
@@ -227,6 +229,52 @@ export default {
            async () =>
            (this.tryToLogin = false)
          );
+    },
+
+     async redirectToHomePage(){
+
+       await this.$store
+          .dispatch("incident/getResourceIncidents", {
+            resource_id: this.resource_id,
+            incident__status: "Started",
+            exited_from_incident_no_date: "true"
+
+          })
+          .then( async response => {
+            if(response.data.count === 1)
+            {
+
+              let incidentInformation = {
+              incidentId: response.data.results[0].incident.id,
+              resourceId: this.resource_id,
+                             };
+             await this.$store.dispatch("incident/updateIncidentUserData", incidentInformation);
+
+             await this.$router.push({ name: "OngoingIncident" });
+
+            }
+            else if(response.data.count === 0)
+            {
+             await this.$router.push({ name: "ActiveIncidents" });
+            }
+            else{
+              this.$store.commit("uiParams/dispatchAlert", {
+                text: "Su usuario esta vinculado a mas de un incidente hable con un administrador",
+                color: "primary"
+              });
+            }
+
+          })
+          .catch(async () => {
+            this.tryToLogin = false;
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Problemas para verificar los incidentes",
+              color: "primary"
+            });
+          })
+          .finally(
+          );
+
     }
   },
 

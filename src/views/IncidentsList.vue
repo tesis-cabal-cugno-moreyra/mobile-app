@@ -236,7 +236,7 @@ export default {
     ...mapGetters({
       domainConfig: "domainConfig/domainConfig",
       userInformation: "restAuth/user",
-      userInformation2: "incident/incidentUserData"
+      resourceIdIncidentId: "incident/incidentUserData"
     })
   }
 
