@@ -1,22 +1,65 @@
 
 <template>
-  <v-app>
+  <v-container >
     <nav-bar></nav-bar>
-      <v-main>
-        <v-container >
+    <v-row align="center" dense class="pt-4 mt-4">
+        <v-col cols="12">
+      <div class="text-center">
+        <div class="my-8">
+        <v-btn
+            min-width="300"
+            @click="viewLinkedVehicles()"
+          color="primary"
+            class="pa-5"
+      >Ver vehículos vinculados
+          <v-icon class="ml-3">
+            mdi-truck-check
+          </v-icon></v-btn>
+        </div>
+
+        <div class="my-8">
+        <v-btn
+            min-width="300"
+            @click="insertMapPoint()"
+            color="primary"
+            class="pa-5"
+        >Notificar situación
+          <v-icon class="ml-13">
+            mdi-cellphone-information
+          </v-icon></v-btn>
+        </div>
+
+        <div>
           <v-btn
-              @click="leaveIncident()"
-              color="primary"
-          >Salir del incidente</v-btn
-          >
-        </v-container>
-      </v-main>
-  </v-app>
+            min-width="300"
+          @click="seeIncidentLocation()"
+          color="primary"
+          class="pa-5"
+        >Ver mapa del incidente
+            <v-icon class="ml-4">
+              mdi-map-marker
+            </v-icon></v-btn>
+        </div>
+        <div class="my-8">
+          <v-btn
+          min-width="300"
+        @click="leaveIncident()"
+        color="primary"
+        class="pa-5"
+      >Salir del incidente
+        <v-icon class="ml-13">
+          mdi-exit-to-app
+        </v-icon></v-btn>
+      </div >
+      </div>
+        </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import NavBar from "@/components/NavBar";
+import NavBar from "../components/NavBar";
 
 export default {
 name: "OngoingIncident",
@@ -49,10 +92,16 @@ name: "OngoingIncident",
         .finally(async () => {
           this.loadingTable = false;
         });
-
-
-
-  }
+  },
+    viewLinkedVehicles(){
+    console.log(this.resourceIdIncidentId)
+    },
+    insertMapPoint(){
+    console.log("aiuuuudaa")
+    },
+    seeIncidentLocation(){
+    console.log("sesa")
+    }
 },
   computed: {
     ...mapGetters({
