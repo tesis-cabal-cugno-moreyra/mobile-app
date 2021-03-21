@@ -54,16 +54,18 @@
       </div>
         </v-col>
     </v-row>
+    <resourceAbleToContainResourceList></resourceAbleToContainResourceList>
   </v-container>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import resourceAbleToContainResourceList from "../components/ResourceAbleToContainResourceList.vue";
 import NavBar from "../components/NavBar";
 
 export default {
 name: "OngoingIncident",
-  components: {NavBar},
+  components: {NavBar, resourceAbleToContainResourceList},
   methods: {
   async leaveIncident()
   {
@@ -87,13 +89,41 @@ name: "OngoingIncident",
             timeout: 4000
           });
 
-          this.loadingTable = false;
         })
-        .finally(async () => {
-          this.loadingTable = false;
-        });
   },
-    viewLinkedVehicles(){
+    async viewLinkedVehicles(){
+
+      await this.$store
+          .dispatch("incident/getResourceVehicleIncident", {incident_id: this.resourceIdIncidentId.incidentId})
+          .then(response  => {
+            console.log(response);
+            if(response.data.count === 0)
+            {
+              this.$store.commit("uiParams/dispatchAlert", {
+              text: "De momento no hay vehiculos vinculados al incidente",
+              color: "primary",
+              timeout: 4000
+            });
+            }
+            else{
+              this.$store.commit(
+                  "incident/changeVisibilityResourceToContainResource"
+              );
+            }
+          console.log("se tiene que abrir una ventana")
+
+
+          })
+          .catch(async () => {
+
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "De momento no hay vehiculos vinculados al incidente",
+              color: "primary",
+              timeout: 4000
+            });
+
+          })
+
     console.log(this.resourceIdIncidentId)
     },
     insertMapPoint(){
