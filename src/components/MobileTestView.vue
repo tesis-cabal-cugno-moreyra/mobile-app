@@ -96,11 +96,11 @@ name: "MobileTestView",
           }
         }
         let currentPosition = await geolocationServices.getCurrentPosition();
-        let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket " + this.storedPointsCounter);
+        let mapPoint = new MapPoint(currentPosition.coords, 1, 1, "Probando websocket " + this.storedPointsCounter);
         webSocketServices.sendPoint(mapPoint);
       } else {
         let currentPosition = await geolocationServices.getCurrentPosition();
-        let mapPoint = new MapPoint(currentPosition.coords, 1, "Probando websocket " + this.storedPointsCounter);
+        let mapPoint = new MapPoint(currentPosition.coords, 1, 1, "Probando websocket " + this.storedPointsCounter);
         await storageServices.setPoint(mapPoint, this);
       }
       this.sendingPoint = false;

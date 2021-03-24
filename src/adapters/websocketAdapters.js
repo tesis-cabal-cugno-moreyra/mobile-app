@@ -1,23 +1,33 @@
 export default {
   mapPointAdapter(mapPoint) {
+    console.log(mapPoint);
     let object = {
       type: "map_point",
       data: {
         lat: mapPoint.getLat(),
-        long: mapPoint.getLng(),
-        message: mapPoint.getComment()
+        lng: mapPoint.getLng(),
+        message: mapPoint.getComment(),
+        incidentId: mapPoint.getIncidentId(),
+        resourceId: mapPoint.getResourceId(),
+        timeCreated: mapPoint.getTimeCreated()
       }
     }
+    console.log(JSON.stringify(object))
     return JSON.stringify(object)
   },
   trackPointAdapter(trackPoint) {
+    console.log(trackPoint);
     let object = {
       type: "track_point",
       data: {
         lat: trackPoint.getLat(),
-        long: trackPoint.getLng(),
+        lng: trackPoint.getLng(),
+        incidentId: trackPoint.getIncidentId(),
+        resourceId: trackPoint.getResourceId(),
+        timeCreated: trackPoint.getTimeCreated()
       }
     }
+    console.log(JSON.stringify(object))
     return JSON.stringify(object)
   },
   pointAdapter(point) {
