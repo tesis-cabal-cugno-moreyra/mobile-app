@@ -1,80 +1,111 @@
 <template>
-  <v-form>
-    <v-card>
-      <v-dialog v-model="showResourceToContainResource.visible" width="600" persistent dark>
-        <v-card-title :class="['pa-4', 'mb-2', 'black_selected']">
-          Recursos para relacionar
-          <v-spacer></v-spacer>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field
-                  v-model="searchName"
-                  append-icon="mdi-magnify"
-                  label="Enter para buscar por nombre"
-                  v-on:keyup.enter="searchResource()"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field
-                  v-model="searchLastName"
-                  append-icon="mdi-magnify"
-                  label="Enter para buscar por apellido"
-                  v-on:keyup.enter="searchResource()"
-              ></v-text-field>
-            </v-col>
+  <v-form >
+  <v-row justify="center">
+    <v-dialog v-model="showResourceToContainResource.visible"
+              v-if="showResourceToContainResource.visible?  (this.loadData = showResourceToContainResource.resourceToContainResource)
+              : (this.loadData = null) "
+              persistent
+              width="600"  dark>
 
-            <v-col cols="6">
-              <v-autocomplete
-                  v-model="autoCompleteTypeResource"
-                  :items="typeResourceSelectedList"
-                  item-text="name"
-                  clearable
-                  label="Tipo de recurso"
-                  @change="searchResource()"
-              ></v-autocomplete>
-            </v-col>
-          </v-row>
-        </v-card-title>
+          <v-card>
+            <v-card-title :class="['pa-3', 'mt-7', 'black_selected']">
+              <v-row align="center" justify="center">
+                Vehículos relacionados
+              </v-row>
+            </v-card-title>
 
-        <v-card-text :class="[' black_selected', 'pa-3']">
-          <v-data-table
-              :loading="loadingTable"
-              loading-text="Cargando... Espere por favor"
-              v-model="selected"
-              :headers="headers"
-              :items="resourceData"
-              :single-select="singleSelect"
-              item-key="id"
-              show-select
-              :class="['pb-1']"
-              hide-default-footer
-          >
-          </v-data-table>
-          <v-pagination
-              v-model="page"
-              class="my-4"
-              :total-visible="10"
-              :length="numberOfPage"
-          ></v-pagination>
-        </v-card-text>
+            <v-card-text :class="[' black_selected', 'pa-1']">
+              <v-data-table
+                  :loading="loadingTable"
+                  loading-text="Cargando... Espere por favor"
+                  :headers="headersResource"
+                  :items="resourceData"
+                  text-center
+                  item-key="id"
+                  :class="['pb-1']"
+                  hide-default-footer
+              >
+                <template v-slot:top>
+                  <v-dialog v-model="dialogChangeStatus" max-width="500px">
+                    <v-card>
+                      <v-card-title class="headline"
+                      >¿Desea unirse a este vehiculo?</v-card-title
+                      >
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="success"
+                            outlined
+                            @click="changeStateConfirmationMessage"
+                            :class="['mr-5']"
+                        >Acepto</v-btn
+                        >
+                        <v-btn
+                            color="primary"
+                            outlined
+                            @click="dialogChangeStatus = false"
+                        >Cancelar</v-btn
+                        >
+                        <v-spacer></v-spacer>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </template>
+                <template v-slot:item.actions="{ item }">
+                  <v-tooltip bottom >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                          v-if="item.resource.id !== showResourceToContainResource.idContainerResource"
+                          v-bind="attrs"
+                          v-on="on"
+                          small
+                          color="success"
+                          @click="openDialogRemove(item)"
+                      >
+                        <v-icon>
+                          mdi-account-plus
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Ingresar al vehiculo</span>
+                  </v-tooltip>
 
-        <v-card-actions :class="['pa-2', 'pb-1', ' black_selected']">
-          <v-spacer></v-spacer>
-          <v-btn
-              :loading="loadingProcessInfo"
-              :class="['mb-2', 'mr-1', 'primary', 'float-right']"
-              v-on:click="processInfo()"
-          >Continuar</v-btn
-          >
-          <v-btn
-              :class="['pa-0', 'mb-2', 'mr-4', 'primary', 'float-right']"
-              @click="onClose"
-          >Cerrar</v-btn
-          >
-        </v-card-actions>
-      </v-dialog>
-    </v-card>
+                  <v-tooltip bottom >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                          bottom v-if="item.resource.id === showResourceToContainResource.idContainerResource"
+                          v-bind="attrs"
+                          v-on="on"
+                          small
+                          color="primary"
+                          @click="openDialogPlus(item)"
+                      >
+                        <v-icon>
+                          mdi-account-remove
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Salir del vehiculo</span>
+                  </v-tooltip>
+                </template>
+
+              </v-data-table>
+              <v-pagination
+                  v-model="page"
+                  class="my-4"
+                  :total-visible="10"
+                  :length="numberOfPage"
+              ></v-pagination>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="onClose()">Cerrar</v-btn>
+            </v-card-actions>
+          </v-card>
+    </v-dialog>
+  </v-row>
   </v-form>
+
 </template>
 
 <script>
@@ -94,6 +125,7 @@ export default {
       loadingTable: false,
       loadingProcessInfo: false,
       isComponentEnable: false,
+      dialogChangeStatus: false,
       singleSelect: false,
       searchName: "",
       searchLastName: "",
@@ -102,33 +134,110 @@ export default {
       numberOfPage: 1,
       selected: [],
       typeResourceSelectedList: [],
+      toJoinResource: true,
       nextPagination: null,
-      headers: [
+      headersResource: [
         {
           text: "Nombre",
           align: "start",
           sortable: false,
-          value: "user.first_name"
+          value: "resource.user.username"
         },
-        { text: "Apellido", sortable: false, value: "user.last_name" },
-        { text: "Tipos de Recursos", sortable: false, value: "type.name" }
+        {text: "Tipo de recurso", sortable: false, value: "resource.type.name"},
+        {
+          text: "Unirse",
+          value: "actions",
+          sortable: false
+        }
       ],
-      resourceData: []
+      loadData: null,
+      resourceData: [],
+      container_resource_id: null
     };
   },
+  async mounted() {
+    if(this.showResourceToContainResource.visible === true)
+    {
+      this.loadResourceData();
+    }
+  },
+  watch: {
+
+    page() {
+      this.loadResourceData();
+    },
+    loadData()
+    {
+      this.loadResourceData();   }
+  } ,
   methods: {
+    openDialogPlus(resourceData){
+      this.dialogChangeStatus = true;
+      this.container_resource_id =  resourceData.resource.id
+    },
+    openDialogRemove(resourceData){
+      this.dialogChangeStatus = true;
+      this.container_resource_id =  resourceData.resource.id
+    }
+    ,
+    async changeStateConfirmationMessage(){
+      let neededInfo = {
+        incident_id : this.userInformation.incidentId,
+        resource_id : this.userInformation.resourceId,
+        container_resource_id : this.container_resource_id
+
+      }
+      await this.$store
+          .dispatch("incident/updateResource", neededInfo)
+          .then( ()=> {
+
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Se vinculo correctamente",
+              color: "success"
+            });
+            this.dialogChangeStatus = false;
+            this.container_resource_id = null;
+          })
+          .catch(e => {
+            console.error(e);
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Hubo un problema para vincularlo",
+              color: "primary"
+            });
+
+          })
+
+    },
     onClose(){
       this.$store.commit("incident/closeResourceToContainResource");
+    },
 
-    }
+    loadResourceData() {
+
+      if(this.showResourceToContainResource.resourceToContainResource.count > 0)
+      {
+        console.log(this.showResourceToContainResource)
+
+        this.resourceData = this.showResourceToContainResource.resourceToContainResource.results;
+
+        let itemsPerPage = process.env.VUE_APP_ITEMS_PER_PAGE;
+        if (!itemsPerPage) {
+          console.error("Variable no declarada en: VUE_APP_ITEMS_PER_PAGE");
+        }
+
+        this.numberOfPage = Math.ceil(this.showResourceToContainResource.resourceToContainResource.count / itemsPerPage);
+      }
+
+    },
 
   },
   computed: {
     ...mapGetters({
-      showResourceToContainResource : "incident/showResourceToContainResource"
+      showResourceToContainResource : "incident/showResourceToContainResource",
+      userInformation: "incident/incidentUserData"
     })
   }
 
-}
+};
 
 </script>

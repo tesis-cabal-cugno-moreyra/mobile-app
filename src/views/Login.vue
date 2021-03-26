@@ -12,45 +12,48 @@
               <v-card-text>
                 <v-form>
                   <v-text-field
-                    id="user"
-                    v-model="username"
-                    label="Usuario"
-                    name="user"
-                    prepend-icon="mdi-account"
-                    type="text"
-                    :error="loginError"
-                    v-on:keyup="resetErrors"
+                      id="user"
+                      v-model="username"
+                      label="Usuario"
+                      name="user"
+                      prepend-icon="mdi-account"
+                      type="text"
+                      :error="loginError"
+                      v-on:keyup="resetErrors"
                   ></v-text-field>
 
                   <v-text-field
-                    id="password"
-                    v-model="password"
-                    label="Contraseña"
-                    name="password"
-                    prepend-icon="mdi-lock"
-                    type="password"
-                    :error="loginError"
-                    v-on:keyup="resetErrors"
+                      id="password"
+                      v-model="password"
+                      label="Contraseña"
+                      name="password"
+                      prepend-icon="mdi-lock"
+                      type="password"
+                      :error="loginError"
+                      v-on:keyup="resetErrors"
                   ></v-text-field>
 
                   <v-alert v-if="loginError" color="error" icon="mdi-alert">
-                    {{ this.errorMessage }}</v-alert
+                    {{ this.errorMessage }}
+                  </v-alert
                   >
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
-                  color="primary"
-                  :loading="tryToLogin"
-                  v-on:click="loginWithJWT"
-                  >Ingresar</v-btn
+                    color="primary"
+                    :loading="tryToLogin"
+                    v-on:click="loginWithJWT"
+                >Ingresar
+                </v-btn
                 >
                 <v-btn
-                  color="primary"
-                  :loading="tryToLogin"
-                  v-on:click="confirmDomain = true"
-                  >Registrarse</v-btn
+                    color="primary"
+                    :loading="tryToLogin"
+                    v-on:click="confirmDomain = true"
+                >Registrarse
+                </v-btn
                 >
               </v-card-actions>
             </v-card>
@@ -66,26 +69,26 @@
             </v-card-title>
             <v-card-text>
               <v-text-field
-                v-model="requiredCode"
-                label=" Ingrese el codigo *"
-                required
+                  v-model="requiredCode"
+                  label=" Ingrese el codigo *"
+                  required
               >
               </v-text-field>
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn
-                :loading="tryToLogin"
-                color="primary"
-                text
-                v-on:click="SendConfirm(requiredCode)"
+                  :loading="tryToLogin"
+                  color="primary"
+                  text
+                  v-on:click="SendConfirm(requiredCode)"
               >
                 Enviar
               </v-btn>
               <v-btn
-                color="primary"
-                text
-                v-on:click="(confirmDomain = false); (requiredCode = '')"
+                  color="primary"
+                  text
+                  v-on:click="(confirmDomain = false); (requiredCode = '')"
               >
                 Cancelar
               </v-btn>
@@ -99,9 +102,9 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 import authServices from "@/services/authServices";
- import SignInResource from "../components/SignInResource.vue";
+import SignInResource from "../components/SignInResource.vue";
 
 export default {
   name: "Login",
@@ -110,7 +113,7 @@ export default {
     SignInResource
   },
 
-  data: function() {
+  data: function () {
     return {
       username: "",
       password: "",
@@ -123,62 +126,66 @@ export default {
     };
   },
   methods: {
-    loginWithJWT: async function() {
+    loginWithJWT: async function () {
       this.tryToLogin = true;
       if (
-        this.username !== "" &&
-        this.password !== "" &&
-        this.loginError === false
+          this.username !== "" &&
+          this.password !== "" &&
+          this.loginError === false
       ) {
-        let payload = { username: this.username, password: this.password };
+        let payload = {username: this.username, password: this.password};
         await this.$store
-          .dispatch("restAuth/login", payload)
-          .then(response => {
-            let accessToken = response.data.access_token;
-            let refreshToken = response.data.refresh_token;
+            .dispatch("restAuth/login", payload)
+            .then(response => {
+              let accessToken = response.data.access_token;
+              let refreshToken = response.data.refresh_token;
 
-            this.$store.dispatch("restAuth/updateAccessToken", accessToken);
-            this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
+              this.$store.dispatch("restAuth/updateAccessToken", accessToken);
+              this.$store.dispatch("restAuth/updateRefreshToken", refreshToken);
 
-            let roles = authServices.getRoles();
-            this.resource_id =response.data.user.resourceprofile.id;
+              let roles = authServices.getRoles();
+              this.resource_id = response.data.user.resourceprofile.id;
 
-            let user = {
-              resourceId: response.data.user.resourceprofile.id,
-              id: response.data.user.id,
-              username: response.data.user.username,
-              email: response.data.user.email,
-              firstName: response.data.user.first_name,
-              lastName: response.data.user.last_name,
-              roles: roles
-            };
-            this.$store.dispatch("restAuth/updateUser", user);
-            if (!authServices.isResource()) {
-              this.loginError = true;
-              this.errorMessage = "¡Ups! Este usuario no tiene un perfil relacionado del tipo Recurso!. " +
-                  "Esta app solamente permite este tipo de usuarios.";
-              this.$store.dispatch("restAuth/logout");
-              return
-            }
-            if (response.data.resourceprofile) {
-              this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
-            }
-            this.redirectToHomePage();
-          })
-          .catch(e => {
-            if (e.status === 400 && e.statusText === "Bad Request") {
-              this.loginError = true;
-              this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
-            } else {
-              console.error(e);
-              this.loginError = true;
-              this.errorMessage = e;
-            }
-          });
+              let user = {
+                resourceId: response.data.user.resourceprofile.id,
+                id: response.data.user.id,
+                username: response.data.user.username,
+                email: response.data.user.email,
+                firstName: response.data.user.first_name,
+                lastName: response.data.user.last_name,
+                roles: roles
+              };
+              this.$store.dispatch("restAuth/updateUser", user);
+              if (!authServices.isResource()) {
+                this.loginError = true;
+                this.errorMessage = "¡Ups! Este usuario no tiene un perfil relacionado del tipo Recurso!. " +
+                    "Esta app solamente permite este tipo de usuarios.";
+                this.$store.dispatch("restAuth/logout");
+                return
+              }
+              if (response.data.resourceprofile) {
+                this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
+              }
+              let resource_id = this.resource_id;
+              this.$store.dispatch(
+                  "uiParams/redirectToHomePage",
+                  { data: {resource_id},vueRouter: this.$router }
+                  );
+            })
+            .catch(e => {
+              if (e.status === 400 && e.statusText === "Bad Request") {
+                this.loginError = true;
+                this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
+              } else {
+                console.error(e);
+                this.loginError = true;
+                this.errorMessage = e;
+              }
+            });
       }
       this.tryToLogin = false;
     },
-    resetErrors: function() {
+    resetErrors: function () {
       this.loginError = false;
     },
 
@@ -193,89 +200,46 @@ export default {
     async SendConfirm(requiredCode) {
       this.tryToLogin = true;
       if (requiredCode.trim() === "") {
-         this.$store.commit("uiParams/dispatchAlert", {
-           text: "Ingrese un codigo",
-           color: "primary"
-         });
+        this.$store.commit("uiParams/dispatchAlert", {
+          text: "Ingrese un codigo",
+          color: "primary"
+        });
         this.tryToLogin = false;
         return;
       }
 
-       await this.$store
-         .dispatch("domainConfig/checkDomainAccessCode", {
-           domain_code: requiredCode
-         })
-         .then(async () => {
-           this.tryToLogin = false;
-
-           await this.$store.commit("domainConfig/addDomainCode", requiredCode);
-
-           this.$store.commit(
-             "uiParams/changeSignInResourceState",
-             !this.showSignInResource
-           );
-
-           this.confirmDomain = false;
-           this.requiredCode = "";
-         })
-         .catch(async () => {
-           this.tryToLogin = false;
-           this.$store.commit("uiParams/dispatchAlert", {
-             text: "Codigo incorrecto",
-             color: "primary"
-           });
-         })
-         .finally(
-           async () =>
-           (this.tryToLogin = false)
-         );
-    },
-
-     async redirectToHomePage(){
-
-       await this.$store
-          .dispatch("incident/getResourceIncidents", {
-            resource_id: this.resource_id,
-            incident__status: "Started",
-            exited_from_incident_no_date: "true"
-
+      await this.$store
+          .dispatch("domainConfig/checkDomainAccessCode", {
+            domain_code: requiredCode
           })
-          .then( async response => {
-            if(response.data.count === 1)
-            {
+          .then(async () => {
+            this.tryToLogin = false;
 
-              let incidentInformation = {
-              incidentId: response.data.results[0].incident.id,
-              resourceId: this.resource_id,
-                             };
-             await this.$store.dispatch("incident/updateIncidentUserData", incidentInformation);
+            await this.$store.commit("domainConfig/addDomainCode", requiredCode);
 
-             await this.$router.push({ name: "OngoingIncident" });
+            this.$store.commit(
+                "uiParams/changeSignInResourceState",
+                !this.showSignInResource
+            );
 
-            }
-            else if(response.data.count === 0)
-            {
-             await this.$router.push({ name: "ActiveIncidents" });
-            }
-            else{
-              this.$store.commit("uiParams/dispatchAlert", {
-                text: "Su usuario esta vinculado a mas de un incidente hable con un administrador",
-                color: "primary"
-              });
-            }
-
+            this.confirmDomain = false;
+            this.requiredCode = "";
           })
-          .catch(async () => {
+          .catch(e => {
+            console.error(e);
             this.tryToLogin = false;
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "Problemas para verificar los incidentes",
+              text: "Codigo incorrecto",
               color: "primary"
             });
           })
           .finally(
+              async () =>
+                  (this.tryToLogin = false)
           );
+    },
 
-    }
+
   },
 
   computed: {

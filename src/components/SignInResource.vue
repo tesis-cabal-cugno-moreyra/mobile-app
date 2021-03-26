@@ -245,7 +245,8 @@ export default {
               timeout: 5000
             });
           })
-          .catch(async () => {
+          .catch(e => {
+            console.error(e);
             this.$store.commit("uiParams/dispatchAlert", {
               text: "Problemas dentro de la creación del recurso",
               color: "primary"

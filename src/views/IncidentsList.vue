@@ -167,7 +167,8 @@ export default {
             this.loadIncidentData(response);
             this.referenceSearch = searchInfo;
           })
-          .catch(async () => {
+          .catch(async e => {
+            console.error(e);
             if (searchInfo.page !== 1) {
               this.page = this.page - 1;
               await this.searchIncident();
@@ -199,8 +200,7 @@ export default {
     openDialogAcceptance(incidentSelected){
       this.incidentSelected = incidentSelected;
       this.dialogChangeVisibility = true;
-      console.log(this.incidentSelected.id);
-      console.log(this.userInformation.resourceId);
+
     },
 
   async  enterToIncident(){
@@ -215,8 +215,8 @@ export default {
 
             await this.$router.push({ name: "OngoingIncident" });
           })
-          .catch(async () => {
-
+          .catch(e => {
+            console.error(e);
               this.$store.commit("uiParams/dispatchAlert", {
                 text: "No se pudo unir al incidente",
                 color: "primary",
