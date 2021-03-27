@@ -5,7 +5,9 @@ export default {
     },
     changeVisibilityResourceToContainResource(state, payload) {
         state.showResourceToContainResource.visible = true;
+
         state.showResourceToContainResource.resourceToContainResource = payload.resourceToContainResource;
+
         state.showResourceToContainResource.idContainerResource = payload.idContainerResource;
 
     },

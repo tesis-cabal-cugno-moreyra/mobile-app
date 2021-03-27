@@ -104,10 +104,11 @@ export default {
               {
                 incident_id: this.resourceIdIncidentId.incidentId,
                 username_Resource: username,
-                resource_to_contain_resources: 'false'
+                resource_to_contain_resources: 'false',
+                has_container_resource: 'false'
               })
           .then(response => {
-            if (response.data.count === 1) {
+            if (response.data.results[0].container_resource !== null) {
               idContainerResource = response.data.results[0].container_resource.id;
             }
           })
@@ -120,7 +121,7 @@ export default {
               {
                 incident_id: this.resourceIdIncidentId.incidentId,
                 username_Resource: '',
-                resource_to_contain_resources: 'True'
+                resource_to_contain_resources: 'true'
               })
           .then(response => {
             if (response.data.count === 0) {
@@ -130,9 +131,6 @@ export default {
                 timeout: 4000
               });
             } else {
-              console.log(response.data)
-
-
               this.$store.commit(
                   "incident/changeVisibilityResourceToContainResource",
                   {

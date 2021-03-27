@@ -53,7 +53,7 @@ export default {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       try {
-        let urlSearch = `/api/v1/incidents/${payload.incident_id}/resources/?resource__user__username=${payload.username_Resource}&resource__type__is_able_to_contain_resources=${payload.resource_to_contain_resources}`;
+        let urlSearch = `/api/v1/incidents/${payload.incident_id}/resources/?resource__user__username=${payload.username_Resource}&has_container_resource=${payload.has_container_resource}&resource__type__is_able_to_contain_resources=${payload.resource_to_contain_resources}`;
         return resolve(await api.get(urlSearch));
       } catch (e) {
         return reject(e);
