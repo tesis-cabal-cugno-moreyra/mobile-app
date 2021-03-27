@@ -857,6 +857,11 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@capacitor-community/background-geolocation@^0.3.11":
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/background-geolocation/-/background-geolocation-0.3.11.tgz#9cb00cccaaa24e59cd65fb7d6bfb5f5d88e89c0e"
+  integrity sha512-bsHqG7gYYyiKcU+m9OZm35lN6kYtZ/ezA51cxMOl8n1NzAkpSgIYQsdnpkuD8ogG5Ty8jKXMhq/UFvWIGb8irQ==
+
 "@capacitor/android@^2.0.0":
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-2.4.2.tgz#ddc55bf0ea78214a0a760330a439916093792d00"
