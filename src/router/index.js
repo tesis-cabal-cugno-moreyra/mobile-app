@@ -23,7 +23,7 @@ const routes = [
     component: Error
   },
   {
-    path: '/',
+    path: '/Home',
     name: 'Home',
     component: Home,
     meta: {
@@ -34,14 +34,14 @@ const routes = [
     }
   },
   {
-    path: '/ActiveIncidents',
+    path: '/',
     name: 'ActiveIncidents',
     component: IncidentsList,
     meta: {
-     //requires_auth: true,
-      //is_admin: true,
-      //is_supervisor: true,
-      //is_resource: true
+     requires_auth: true,
+      is_admin: true,
+      is_supervisor: true,
+      is_resource: true
     }
   },
   {
@@ -49,10 +49,10 @@ const routes = [
     name: 'OngoingIncident',
     component: OngoingIncident,
     meta: {
-      //requires_auth: true,
-      //is_admin: true,
-      //is_supervisor: true,
-      //is_resource: true
+      requires_auth: true,
+      is_admin: true,
+      is_supervisor: true,
+      is_resource: true
     }
   },
   {
