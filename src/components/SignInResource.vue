@@ -197,7 +197,7 @@ export default {
               }
               if (responseError.data.username) {
                 if (
-                    responseError.data.username ==
+                    responseError.data.username ===
                     "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters."
                 ) {
                   this.errorUserNameField =

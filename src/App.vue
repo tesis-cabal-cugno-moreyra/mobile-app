@@ -16,6 +16,7 @@ import appServices from "@/services/appServices";
 import authServices from "@/services/authServices";
 import storageServices from "@/services/storageServices";
 import {mapGetters} from "vuex";
+import { SplashScreen } from "@capacitor/core";
 
 export default {
   name: 'App',
@@ -38,6 +39,7 @@ export default {
         localStorage.setItem("access-token", response.data.access)
       })
     }
+    await SplashScreen.hide();
   },
   async created() {
     let context = this;

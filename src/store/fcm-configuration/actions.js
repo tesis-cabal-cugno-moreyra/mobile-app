@@ -30,7 +30,7 @@ export default {
     }
 
     const payload = {
-      "registration_id": deviceToken,
+      "registration_id": deviceToken.value,
       "active": true,
       "type": Capacitor.platform
     };

@@ -163,8 +163,8 @@ export default {
                 this.$store.dispatch("restAuth/logout");
                 return
               }
-              if (response.data.resourceprofile) {
-                this.sendDeviceTokenOnLogin(response.data.resourceprofile.id);
+              if (response.data.user.resourceprofile) {
+                this.sendDeviceTokenOnLogin(response.data.user.resourceprofile.id);
               }
               let resource_id = this.resource_id;
               this.$store.dispatch(
