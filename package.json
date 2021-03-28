@@ -55,7 +55,12 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "linebreak-style": [
+        "error",
+        "unix"
+      ]
+    }
   },
   "browserslist": [
     "> 1%",
