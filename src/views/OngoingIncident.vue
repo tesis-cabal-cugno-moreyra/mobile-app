@@ -55,6 +55,34 @@
             </v-btn>
           </div>
         </div>
+        <v-dialog v-model="dialogExitIncidentStatus" max-width="300px">
+          <v-card>
+            <v-card-title class="justify-center"
+            ><p>¿Desea salir de </p>
+              <p>este incidente?</p>
+            </v-card-title
+            >
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                  color="success"
+                  outlined
+                  @click="changeStateConfirmationExitToIncident"
+                  :class="['mr-5']"
+              >Salir
+              </v-btn
+              >
+              <v-btn
+                  color="primary"
+                  outlined
+                  @click="dialogExitIncidentStatus = false"
+              >Cancelar
+              </v-btn
+              >
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
     <resourceAbleToContainResourceList></resourceAbleToContainResourceList>
@@ -69,29 +97,14 @@ import NavBar from "../components/NavBar";
 export default {
   name: "OngoingIncident",
   components: {NavBar, resourceAbleToContainResourceList},
+  data() {
+    return {
+      dialogExitIncidentStatus: false
+    }
+  },
   methods: {
     async leaveIncident() {
-      await this.$store
-          .dispatch("incident/deleteResourceIncident", this.userInformation)
-          .then(() => {
-            this.$router.push({name: "ActiveIncidents"});
-
-            this.$store.commit("uiParams/dispatchAlert", {
-              text: "Se lo quito del incidente correctamente",
-              color: "#49cc90",
-              timeout: 4000
-            });
-
-          })
-          .catch(e => {
-            console.error(e);
-            this.$store.commit("uiParams/dispatchAlert", {
-              text: "No se pudo quitar del incidente",
-              color: "primary",
-              timeout: 4000
-            });
-
-          })
+      this.dialogExitIncidentStatus = true;
     },
     async viewLinkedVehicles() {
       const dataResource = localStorage.getItem("user");
@@ -157,8 +170,30 @@ export default {
       console.log(this.$router)
     },
     seeIncidentLocation() {
-      console.log("sesa")
-    }
+      console.log("Aqui iria un mapa de la incidencia")
+    },
+    async changeStateConfirmationExitToIncident()
+    { await this.$store
+        .dispatch("incident/deleteResourceIncident", this.userInformation)
+        .then(() => {
+          this.$router.push({name: "ActiveIncidents"});
+
+          this.$store.commit("uiParams/dispatchAlert", {
+            text: "Se lo quito del incidente correctamente",
+            color: "success",
+            timeout: 4000
+          });
+
+        })
+        .catch(e => {
+          console.error(e);
+          this.$store.commit("uiParams/dispatchAlert", {
+            text: "No se pudo quitar del incidente",
+            color: "primary",
+            timeout: 4000
+          });
+
+        })}
   },
   computed: {
     ...mapGetters({

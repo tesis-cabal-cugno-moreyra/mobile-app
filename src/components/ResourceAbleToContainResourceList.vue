@@ -26,10 +26,11 @@
                 hide-default-footer
             >
               <template v-slot:top>
-                <v-dialog v-model="dialogChangeStatus" max-width="500px">
+                <v-dialog v-model="dialogChangeStatus" max-width="300px">
                   <v-card>
-                    <v-card-title class="headline"
-                    >¿Desea unirse a este vehiculo?
+                    <v-card-title class="justify-center"
+                    ><p class="text-center">¿Desea unirse a </p>
+                      <p>este vehiculo?</p>
                     </v-card-title
                     >
                     <v-card-actions>
@@ -53,10 +54,11 @@
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
-                <v-dialog v-model="dialogDeleteStatus" max-width="500px">
+                <v-dialog v-model="dialogDeleteStatus" max-width="300px">
                   <v-card>
-                    <v-card-title class="headline"
-                    >¿Desea Salir de este vehiculo?
+                    <v-card-title class="justify-center"
+                    ><p>¿Desea salir de </p>
+                      <p>este vehiculo?</p>
                     </v-card-title
                     >
                     <v-card-actions>
@@ -232,7 +234,6 @@ export default {
                   idContainerResource: null
                 }
             );
-            console.log(this.showResourceToContainResource)
 
           })
           .catch(e => {
@@ -255,7 +256,6 @@ export default {
       await this.$store
           .dispatch("incident/updateResource", neededInfo)
           .then(() => {
-            console.log("gola")
             this.$store.commit("uiParams/dispatchAlert", {
               text: "Se vinculo correctamente",
               color: "success"

@@ -19,8 +19,10 @@
         <template v-slot:top>
           <v-dialog v-model="dialogChangeVisibility" max-width="350px">
             <v-card>
-              <v-card-title class="headline"
-              >¿Desea unirse a este incidente?</v-card-title
+              <v-card-title  class="justify-center"
+              >
+                <p>¿Desea unirse a </p
+                ><p>este incidente?</p> </v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
