@@ -19,8 +19,10 @@
         <template v-slot:top>
           <v-dialog v-model="dialogChangeVisibility" max-width="350px">
             <v-card>
-              <v-card-title class="headline"
-              >¿Desea unirse a este incidente?</v-card-title
+              <v-card-title  class="justify-center"
+              >
+                <p>¿Desea unirse a </p
+                ><p>este incidente?</p> </v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -167,7 +169,8 @@ export default {
             this.loadIncidentData(response);
             this.referenceSearch = searchInfo;
           })
-          .catch(async () => {
+          .catch(async e => {
+            console.error(e);
             if (searchInfo.page !== 1) {
               this.page = this.page - 1;
               await this.searchIncident();
@@ -199,8 +202,7 @@ export default {
     openDialogAcceptance(incidentSelected){
       this.incidentSelected = incidentSelected;
       this.dialogChangeVisibility = true;
-      console.log(this.incidentSelected.id);
-      console.log(this.userInformation.resourceId);
+
     },
 
   async  enterToIncident(){
@@ -215,8 +217,8 @@ export default {
 
             await this.$router.push({ name: "OngoingIncident" });
           })
-          .catch(async () => {
-
+          .catch(e => {
+            console.error(e);
               this.$store.commit("uiParams/dispatchAlert", {
                 text: "No se pudo unir al incidente",
                 color: "primary",
@@ -236,7 +238,7 @@ export default {
     ...mapGetters({
       domainConfig: "domainConfig/domainConfig",
       userInformation: "restAuth/user",
-      userInformation2: "incident/incidentUserData"
+      resourceIdIncidentId: "incident/incidentUserData"
     })
   }
 
