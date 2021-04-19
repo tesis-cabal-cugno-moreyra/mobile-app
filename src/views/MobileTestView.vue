@@ -63,6 +63,51 @@
           </v-card-actions>
         </v-card>
       </v-col>
+      <v-col cols="12">
+        <v-card
+            color="#103f79"
+            dark
+            v-if="locationWatchers"
+        >
+          <v-card-title class="headline">
+            Watchers
+          </v-card-title>
+          <v-card-text>
+            <v-btn
+                color="#f3b229"
+                text
+                v-on:click="removeGeolocationWatcher(locationWatcherId)"
+                v-for="(locationWatcherId, id) in locationWatchers" v-bind:key="id"
+            >
+              Finish watcher with id {{ locationWatcherId }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12">
+        <v-card
+            color="#103f79"
+            dark
+            v-if="locations"
+        >
+          <v-card-title class="headline">
+            Logged locations (successfully sent: {{ successfullySentLocationsAmount }})
+          </v-card-title>
+          <v-card-actions>
+            <v-btn
+                color="#f3b229"
+                text
+                v-on:click="clearLoggedLocations"
+            >
+              Clear list
+            </v-btn>
+          </v-card-actions>
+          <v-card-text v-for="(location, id) in locations" v-bind:key="id">
+            <p>Lat, long: {{ location.latitude }}, {{ location.longitude }}</p>
+            <p>Time: {{ new Date(location.time) }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -91,7 +136,10 @@ export default {
       storingPoint: false,
       storingPointDisable: false,
       sendingPoint: false,
-      sendingPointDisable: false
+      sendingPointDisable: false,
+      locations: [],
+      locationWatchers: [],
+      successfullySentLocationsAmount: 0,
     }
   },
   methods: {
@@ -135,40 +183,17 @@ export default {
     },
     sendTrackPointOnBackground() {
       // To start listening for changes in the device's location, add a new watcher.
-// You do this by calling 'addWatcher' with an options object and a callback. An
-// ID is returned, which can be used to remove the watcher in the future. The
-// callback will be called every time a new location is available. Watchers can
-// not be paused, only removed. Multiple watchers may exist at the same time.
-//       const watcher_id = BackgroundGeolocation.addWatcher(
-      BackgroundGeolocation.addWatcher(
+      // You do this by calling 'addWatcher' with an options object and a callback. An
+      // ID is returned, which can be used to remove the watcher in the future. The
+      // callback will be called every time a new location is available. Watchers can
+      // not be paused, only removed. Multiple watchers may exist at the same time.
+      // const watcher_id = BackgroundGeolocation.addWatcher(
+      const context = this;
+      this.locationWatchers.push(BackgroundGeolocation.addWatcher(
           {
-            // If the "backgroundMessage" option is defined, the watcher will
-            // provide location updates whether the app is in the background or the
-            // foreground. If it is not defined, location updates are only
-            // guaranteed in the foreground. This is true on both platforms.
-
-            // On Android, a notification must be shown to continue receiving
-            // location updates in the background. This option specifies the text of
-            // that notification.
             backgroundMessage: "Cancel to prevent battery drain.",
-
-            // The title of the notification mentioned above. Defaults to "Using
-            // your location".
             backgroundTitle: "Tracking You.",
-
-            // Whether permissions should be requested from the user automatically,
-            // if they are not already granted. Defaults to "true".
-            requestPermissions: true,
-
-            // If "true", stale locations may be delivered while the device
-            // obtains a GPS fix. You are responsible for checking the "time"
-            // property. If "false", locations are guaranteed to be up to date.
-            // Defaults to "false".
-            stale: false,
-
-            // The minimum number of metres between subsequent locations. Defaults
-            // to 0.
-            distanceFilter: 50
+            distanceFilter: 0
           },
           async function callback(location, error) {
             if (error) {
@@ -180,7 +205,7 @@ export default {
                       "but does not have permission.\n\n" +
                       "Open settings now?"
                   )
-                }).then(function ({value}) {
+                }).then(({value}) => {
                   if (value) {
                     // It can be useful to direct the user to their device's
                     // settings when location permissions have been denied.
@@ -193,11 +218,34 @@ export default {
               return console.error(error);
             }
 
-            const response = await Api.post('/logging/', location);
-            console.log(response);
+            context.locations.push(location);
+            // As location is relevated once per second, we divide this lecture, and send the last one
+            if (context.locations.length === 10) {
+              const lastLocation = context.locations.pop();
+              if (lastLocation) {
+                const response = await Api.post('/logging/', lastLocation);
+                console.log(response);
+                if (response.status === 200) {
+                  context.successfullySentLocationsAmount += 1;
+                }
+                context.clearLoggedLocations();
+              } else {
+                console.error("Location not relevated! Try again later");
+              }
+            }
+
             return console.log(location);
           }
-      );
+      ));
+    },
+    removeGeolocationWatcher(watcherId) {
+      BackgroundGeolocation.removeWatcher({
+        id: watcherId
+      });
+      this.locationWatchers = this.locationWatchers.filter((id) => id !== watcherId)
+    },
+    clearLoggedLocations() {
+      this.locations = []
     }
   }
 
