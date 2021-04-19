@@ -3,12 +3,13 @@ import VueRouter from 'vue-router'
 
 import authServices from "@/services/authServices";
 
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
-import About from '../views/About.vue'
-import Error from '../views/Error.vue'
-import IncidentsList from '../views/IncidentsList.vue'
-import OngoingIncident from '../views/OngoingIncident.vue'
+import Home from '@/views/Home.vue'
+import Login from '@/views/Login.vue'
+import About from '@/views/About.vue'
+import Error from '@/views/Error.vue'
+import IncidentsList from '@/views/IncidentsList.vue'
+import OngoingIncident from '@/views/OngoingIncident.vue'
+import MobileTestView from "@/views/MobileTestView";
 
 Vue.use(VueRouter)
 
@@ -65,6 +66,17 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About,
+    meta: {
+      requires_auth: true,
+      is_admin: true,
+      is_supervisor: true,
+      is_resource: true
+    }
+  },
+  {
+    path: '/debug',
+    name: 'Debug',
+    component: MobileTestView,
     meta: {
       requires_auth: true,
       is_admin: true,

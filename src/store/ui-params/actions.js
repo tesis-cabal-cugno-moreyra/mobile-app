@@ -24,7 +24,6 @@ export default {
             }, { root: true } )
             .then(async response => {
                 if (response.data.count === 1) {
-
                     let incidentInformation = {
                         incidentId: response.data.results[0].incident.id,
                         resourceId: resource_id,
@@ -39,7 +38,7 @@ export default {
                     }
                 } else {
                     context.commit("dispatchAlert", {
-                        text: "Su usuario esta vinculado a mas de un incidente hable con un administrador",
+                        text: "Su usuario esta vinculado a mas de un incidente, hable con un administrador",
                         color: "primary"
                     });
                 }

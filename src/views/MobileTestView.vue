@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <NavBar></NavBar>
     <v-row dense class="pt-4 mt-4">
       <v-col cols="12">
         <v-card
@@ -52,6 +53,13 @@
             >
               Almacenar Point
             </v-btn>
+            <v-btn
+                color="#f3b229"
+                text
+                v-on:click="sendTrackPointOnBackground"
+            >
+              Background
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -61,6 +69,7 @@
 
 <script>
 import {mapState} from 'vuex';
+import NavBar from "@/components/NavBar";
 import geolocationServices from "@/services/geolocationServices";
 import storageServices from "@/services/storageServices";
 import {MapPoint} from "@/domain/MapPoint"
@@ -73,6 +82,7 @@ const {BackgroundGeolocation, Modals} = Plugins;
 
 export default {
   name: "MobileTestView",
+  components: { NavBar },
   computed: {
     ...mapState('mobileEventsStatus', ['networkStatus', 'applicationIsActive', 'storedPointsCounter'])
   },
@@ -183,7 +193,7 @@ export default {
               return console.error(error);
             }
 
-            const response = await Api.post('/logging/', location)
+            const response = await Api.post('/logging/', location);
             console.log(response);
             return console.log(location);
           }
