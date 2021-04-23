@@ -85,6 +85,45 @@
         </v-dialog>
       </v-col>
     </v-row>
+
+    <v-form ref="form" lazy-validation>
+      <v-row >
+        <v-dialog v-model="showMapPointSelector" max-width="300px">
+          <v-card>
+            <v-card-title>
+              <span class="headline">Notificar situación</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="12" sm="8" md="8">
+                  <v-text-field
+                      v-model="mapPointText"
+                      :counter="50"
+                      autocomplete="off"
+                      label="Describa la situación*"
+                      :error-messages="errorMapPointTexField"
+                  ></v-text-field>
+                </v-col>
+                </v-row>
+              </v-container>
+              <small>* Campos requeridos</small>
+            </v-card-text>
+            <v-card-actions :class="['mb-2', 'pa-1', 'mr-3']">
+              <v-spacer></v-spacer>
+              <v-btn
+                  color="primary"
+                  text
+                  v-on:click="validateMapPoint()"
+              >Enviar</v-btn
+              >
+              <v-btn color="primary" text @click="onClose()">Cancelar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
+    </v-form>
+
     <resourceAbleToContainResourceList></resourceAbleToContainResourceList>
   </v-container>
 </template>
@@ -99,7 +138,11 @@ export default {
   components: {NavBar, resourceAbleToContainResourceList},
   data() {
     return {
-      dialogExitIncidentStatus: false
+      dialogExitIncidentStatus: false,
+      showMapPointSelector: false,
+      mapPointText: '',
+      mapPointTextRules:[ v => !!v || "El texto es obligatorio"],
+      errorMapPointTexField: null,
     }
   },
   methods: {
@@ -152,8 +195,6 @@ export default {
                   }
               );
             }
-
-
           })
           .catch(e => {
             console.error(e);
@@ -166,8 +207,52 @@ export default {
           })
 
     },
+
     insertMapPoint() {
-      console.log(this.$router)
+      this.showMapPointSelector = true
+
+    },
+    async validateMapPoint(){
+      if(this.mapPointText === '')
+      {
+        this.errorMapPointTexField = 'Debe escribir una descripción '
+      }
+      else
+      {
+        this.errorMapPointTexField = null;
+        await this.$store
+            .dispatch("incident/postMapPointResource",
+                {
+                  incident_id: this.resourceIdIncidentId.incidentId,
+                  resource_id: this.userInformation.resourceId,
+                  comment: this.mapPointText,
+                  location: [-62.490234, -30.675715] ,
+                  time_created: new Date()
+                })
+            .then( ()=> {
+              this.$store.commit("uiParams/dispatchAlert", {
+                text: "Se ha enviado el map point ",
+                color: "success",
+                timeout: 4000
+              });
+              this.showMapPointSelector = false;
+            })
+            .catch(e => {
+              console.error(e);
+
+              this.$store.commit("uiParams/dispatchAlert", {
+                text: "Hubo un problema para enviar el map point",
+                color: "primary",
+                timeout: 4000
+              });
+            })
+      }
+
+    },
+    onClose(){
+      this.showMapPointSelector = false;
+      this.mapPointText = '';
+      this.errorMapPointTexField = null;
     },
     seeIncidentLocation() {
       console.log("Aqui iria un mapa de la incidencia")
