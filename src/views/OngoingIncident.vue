@@ -20,7 +20,7 @@
           <div class="my-8">
             <v-btn
                 min-width="300"
-                @click="insertMapPoint()"
+                @click="dialogMapPoint = true"
                 color="primary"
                 class="pa-5"
             >Notificar situación
@@ -85,6 +85,102 @@
         </v-dialog>
       </v-col>
     </v-row>
+
+    <v-dialog
+      v-model="dialogMapPoint"
+      width="500"
+    >
+      <v-card>
+        <v-form ref="mapPointForm" lazy-validation>
+          <v-card-title>
+            Notificar situación
+          </v-card-title>
+
+          <v-divider></v-divider>
+
+          <v-card-text>
+            <v-textarea
+                label="Texto descriptivo de la situación *"
+                required
+                autocomplete="off"
+                v-model="mapPointComment"
+                :rules="mapPointCommentRules"
+                :error-messages="errorMapPointCommentField"
+            ></v-textarea>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn
+                color="primary"
+                text
+                @click="insertMapPoint"
+                :loading="loadingSendMapPoint"
+            >
+              Enviar
+            </v-btn>
+            <v-btn
+                color="primary"
+                text
+                @click="dialogMapPoint = false"
+                :loading="loadingSendMapPoint"
+            >
+              Volver
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
+      v-model="dialogMap"
+      width="500"
+    >
+      <v-card>
+        <v-card-title>
+          Ubicación del Incidente
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text>
+          <v-img>
+            <l-map
+                :zoom="15"
+                :center="mapCenter"
+                :options="{ zoomSnap: 0.5 }"
+                style="z-index: 0; height: 65vh; width: 100%; margin-top: 16px"
+                ref="incidentLocationMap"
+            >
+              <l-tile-layer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <l-marker :lat-lng="mapCenter">
+                <l-popup>
+                  <div>
+                    Ubicación del Incidente
+                  </div>
+                </l-popup>
+              </l-marker>
+
+            </l-map>
+          </v-img>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              color="primary"
+              text
+              @click="dialogMap = false"
+          >
+            Volver a la vista principal
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <resourceAbleToContainResourceList></resourceAbleToContainResourceList>
   </v-container>
 </template>
@@ -93,13 +189,26 @@
 import {mapGetters} from "vuex";
 import resourceAbleToContainResourceList from "../components/ResourceAbleToContainResourceList.vue";
 import NavBar from "../components/NavBar";
+import {LatLng} from "leaflet/dist/leaflet-src.esm";
+import geolocationServices from "@/services/geolocationServices";
+import {MapPoint} from "@/domain/MapPoint";
+import webSocketServices from "@/services/webSocketServices";
 
 export default {
   name: "OngoingIncident",
   components: {NavBar, resourceAbleToContainResourceList},
   data() {
     return {
-      dialogExitIncidentStatus: false
+      dialogExitIncidentStatus: false,
+      dialogMap: false,
+      dialogMapPoint: false,
+      mapCenter: new LatLng(0,0),
+      loadingSendMapPoint: false,
+      mapPointComment: '',
+      mapPointCommentRules: [
+        v => !!v || "El comentario es obligatorio",
+      ],
+      errorMapPointCommentField: null
     }
   },
   methods: {
@@ -113,68 +222,96 @@ export default {
       let idContainerResource = null;
 
       await this.$store
-          .dispatch("incident/getResourceVehicleIncident",
-              {
-                incident_id: this.resourceIdIncidentId.incidentId,
-                username_Resource: username,
-                resource_to_contain_resources: 'false',
-                has_container_resource: 'false'
-              })
-          .then(response => {
-            if (response.data.results[0].container_resource !== null) {
-              idContainerResource = response.data.results[0].container_resource.id;
-            }
-          })
-          .catch(e => {
-            console.error(e);
-          })
+        .dispatch("incident/getResourceVehicleIncident",
+            {
+              incident_id: this.incidentUserData.incidentId,
+              username_Resource: username,
+              resource_to_contain_resources: 'false',
+              has_container_resource: 'false'
+            })
+        .then(response => {
+          if (response.data.results[0].container_resource !== null) {
+            idContainerResource = response.data.results[0].container_resource.id;
+          }
+        })
+        .catch(e => {
+          console.error(e);
+        })
 
       await this.$store
-          .dispatch("incident/getResourceVehicleIncident",
-              {
-                incident_id: this.resourceIdIncidentId.incidentId,
-                username_Resource: '',
-                resource_to_contain_resources: 'true'
-              })
-          .then(response => {
-            if (response.data.count === 0) {
-              this.$store.commit("uiParams/dispatchAlert", {
-                text: "De momento no hay vehiculos vinculados al incidente",
-                color: "primary",
-                timeout: 4000
-              });
-            } else {
-              this.$store.commit(
-                  "incident/changeVisibilityResourceToContainResource",
-                  {
-                    resourceToContainResource: response.data,
-                    idContainerResource: idContainerResource
-                  }
-              );
-            }
-
-
-          })
-          .catch(e => {
-            console.error(e);
+        .dispatch("incident/getResourceVehicleIncident",
+            {
+              incident_id: this.incidentUserData.incidentId,
+              username_Resource: '',
+              resource_to_contain_resources: 'true'
+            })
+        .then(response => {
+          if (response.data.count === 0) {
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "Hubo un problema para encontrar vehiculos vinculados al incidente",
+              text: "De momento no hay vehiculos vinculados al incidente",
               color: "primary",
               timeout: 4000
             });
-
+          } else {
+            this.$store.commit(
+                "incident/changeVisibilityResourceToContainResource",
+                {
+                  resourceToContainResource: response.data,
+                  idContainerResource: idContainerResource
+                }
+            );
+          }
           })
+        .catch(e => {
+          console.error(e);
+          this.$store.commit("uiParams/dispatchAlert", {
+            text: "Hubo un problema para encontrar vehiculos vinculados al incidente",
+            color: "primary",
+            timeout: 4000
+          });
 
+        })
     },
-    insertMapPoint() {
-      console.log(this.$router)
+    async insertMapPoint() {
+      this.loadingSendMapPoint = true;
+      this.errorMapPointCommentField = null;
+      let isValid = this.$refs.mapPointForm.validate();
+
+      if (!isValid) {
+        this.$store.commit("uiParams/dispatchAlert", {
+          text: "Debe rellenar todos los campos necesarios",
+          color: "primary"
+        });
+        return
+      }
+
+      let currentPosition = await geolocationServices.getCurrentPosition();
+      let mapPoint = new MapPoint(
+          currentPosition.coords, this.incidentUserData.resourceId,
+          this.incidentUserData.incidentId, this.mapPointComment
+      );
+
+      // REFACTOR THIS using NetworManager or similar
+      webSocketServices.sendPoint(mapPoint);
+
+      this.dialogMapPoint = false;
+      this.loadingSendMapPoint = false;
     },
     seeIncidentLocation() {
-      console.log("Aqui iria un mapa de la incidencia")
+      this.mapCenter = new LatLng(
+          this.incidentUserData.incident.locationPoint.coordinates[0],
+          this.incidentUserData.incident.locationPoint.coordinates[1]
+      )
+      this.dialogMap = true
+      // This is a fix to show the map correctly, being a part of the map component.
+      setTimeout(() => {
+        //mapObject is a property that is part of leaflet
+        this.$refs.incidentLocationMap.mapObject.invalidateSize();
+      }, 100);
     },
-    async changeStateConfirmationExitToIncident()
-    { await this.$store
-        .dispatch("incident/deleteResourceIncident", this.userInformation)
+    async changeStateConfirmationExitToIncident() {
+      await this.$store
+        .dispatch("incident/deleteResourceIncident", this.incidentUserData)
         .then(() => {
           this.$router.push({name: "ActiveIncidents"});
 
@@ -197,9 +334,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      userInformation: "incident/incidentUserData",
-      resourceIdIncidentId: "incident/incidentUserData"
-
+      incidentUserData: "incident/incidentUserData",
     })
   }
 

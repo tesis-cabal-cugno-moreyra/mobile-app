@@ -1,3 +1,5 @@
+import Incident from "@/domain/Incident";
+
 export default {
     turnOnSpinnerOverlay(context) {
         context.commit("changeSpinnerOverlayState", true);
@@ -20,15 +22,32 @@ export default {
                 resource_id: resource_id,
                 incident__status: "Started",
                 exited_from_incident_no_date: "true"
-
             }, { root: true } )
             .then(async response => {
                 if (response.data.count === 1) {
+                    let incidentData = response.data.results[0].incident
+                    let incident = new Incident(
+                        incidentData.id,
+                        incidentData.domain_name,
+                        incidentData.incident_type_name,
+                        incidentData.external_assistance,
+                        incidentData.data_status,
+                        incidentData.status,
+                        incidentData.location_as_string_reference,
+                        incidentData.location_point,
+                        incidentData.reference,
+                        incidentData.created_at,
+                        incidentData.updated_at,
+                        incidentData.cancelled_at,
+                        incidentData.finalized_at,
+                    )
+                    console.log({incidentData, incident})
                     let incidentInformation = {
-                        incidentId: response.data.results[0].incident.id,
+                        incidentId: incidentData.id,
                         resourceId: resource_id,
+                        incident
                     };
-                    await context.dispatch("incident/updateIncidentUserData", incidentInformation, { root: true });
+                    await context.commit("incident/updateIncidentUserData", incidentInformation, { root: true });
                     if(vueRouter.history.current.name !== 'OngoingIncident') {
                         await vueRouter.push({name: "OngoingIncident"});
                     }
