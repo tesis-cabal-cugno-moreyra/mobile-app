@@ -182,6 +182,10 @@
       </v-card>
     </v-dialog>
     <resourceAbleToContainResourceList></resourceAbleToContainResourceList>
+    <background-geolocation
+        :resource-id="incidentUserData.resourceId"
+        :incident-id="incidentUserData.incidentId"
+    ></background-geolocation>
   </v-container>
 </template>
 
@@ -192,11 +196,12 @@ import NavBar from "../components/NavBar";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import geolocationServices from "@/services/geolocationServices";
 import {MapPoint} from "@/domain/MapPoint";
-import webSocketServices from "@/services/webSocketServices";
+import BackgroundGeolocation from "@/components/BackgroundGeolocation";
+import PointAPIManager from "@/services/PointAPIManager";
 
 export default {
   name: "OngoingIncident",
-  components: {NavBar, resourceAbleToContainResourceList},
+  components: {BackgroundGeolocation, NavBar, resourceAbleToContainResourceList},
   data() {
     return {
       dialogExitIncidentStatus: false,
@@ -208,7 +213,8 @@ export default {
       mapPointCommentRules: [
         v => !!v || "El comentario es obligatorio",
       ],
-      errorMapPointCommentField: null
+      errorMapPointCommentField: null,
+      pointApiManager: new PointAPIManager(this),
     }
   },
   methods: {
@@ -286,14 +292,10 @@ export default {
       }
 
       let currentPosition = await geolocationServices.getCurrentPosition();
-      let mapPoint = new MapPoint(
+      await this.pointApiManager.handlePoint(new MapPoint(
           currentPosition.coords, this.incidentUserData.resourceId,
           this.incidentUserData.incidentId, this.mapPointComment
-      );
-
-      // REFACTOR THIS using NetworManager or similar
-      webSocketServices.sendPoint(mapPoint);
-
+      ));
       this.dialogMapPoint = false;
       this.loadingSendMapPoint = false;
     },

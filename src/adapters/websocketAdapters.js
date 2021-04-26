@@ -31,6 +31,7 @@ export default {
     return JSON.stringify(object)
   },
   pointAdapter(point) {
+    console.log(`websocketAdapter: point lat: ${point.getLat()}, long: ${point.getLng()}`)
     if (point.internalType === "MapPoint") {
       return this.mapPointAdapter(point);
     } else if (point.internalType === "TrackPoint") {
