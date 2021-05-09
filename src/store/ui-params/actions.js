@@ -28,6 +28,7 @@ export default {
                     let incidentInformation = {
                         incidentId: response.data.results[0].incident.id,
                         resourceId: resource_id,
+                        incidentName: response.data.results[0].incident.incident_type_name
                     };
                     await context.dispatch("incident/updateIncidentUserData", incidentInformation, { root: true });
                     if(vueRouter.history.current.name !== 'OngoingIncident') {

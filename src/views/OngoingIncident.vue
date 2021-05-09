@@ -143,6 +143,7 @@ export default {
       mapPointText: '',
       mapPointTextRules:[ v => !!v || "El texto es obligatorio"],
       errorMapPointTexField: null,
+      descriptionMapPoints: []
     }
   },
   methods: {
@@ -158,7 +159,7 @@ export default {
       await this.$store
           .dispatch("incident/getResourceVehicleIncident",
               {
-                incident_id: this.resourceIdIncidentId.incidentId,
+                incident_id: this.resourceDataIncidentData.incidentId,
                 username_Resource: username,
                 resource_to_contain_resources: 'false',
                 has_container_resource: 'false'
@@ -175,7 +176,7 @@ export default {
       await this.$store
           .dispatch("incident/getResourceVehicleIncident",
               {
-                incident_id: this.resourceIdIncidentId.incidentId,
+                incident_id: this.resourceDataIncidentData.incidentId,
                 username_Resource: '',
                 resource_to_contain_resources: 'true'
               })
@@ -213,6 +214,32 @@ export default {
 
     },
     async validateMapPoint(){
+
+      await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
+
+            let incidentsArray =  response.data.incidentAbstractions;
+
+        incidentsArray.forEach(incident =>  {
+            if(incident.name === this.resourceDataIncidentData.incidentName)
+            {
+              this.descriptionMapPoints  =  incident.types.descriptions
+
+            }
+            else
+            {
+             incident.types.forEach(typeIncident =>{
+               if(typeIncident.name === this.resourceDataIncidentData.incidentName)
+               {
+                 console.log(typeIncident.descriptions)
+                 this.descriptionMapPoints = typeIncident.descriptions
+               }
+             })
+            }
+        })
+
+        console.log( this.descriptionMapPoints.length )
+      })
+
       if(this.mapPointText === '')
       {
         this.errorMapPointTexField = 'Debe escribir una descripción '
@@ -223,7 +250,7 @@ export default {
         await this.$store
             .dispatch("incident/postMapPointResource",
                 {
-                  incident_id: this.resourceIdIncidentId.incidentId,
+                  incident_id: this.resourceDataIncidentData.incidentId,
                   resource_id: this.userInformation.resourceId,
                   comment: this.mapPointText,
                   location: [-62.490234, -30.675715] ,
@@ -283,7 +310,7 @@ export default {
   computed: {
     ...mapGetters({
       userInformation: "incident/incidentUserData",
-      resourceIdIncidentId: "incident/incidentUserData"
+      resourceDataIncidentData: "incident/incidentUserData"
 
     })
   }
