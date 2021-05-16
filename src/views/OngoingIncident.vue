@@ -87,27 +87,33 @@
     </v-row>
 
     <v-form ref="form" lazy-validation>
-      <v-row >
+      <v-row>
         <v-dialog v-model="showMapPointSelector" max-width="300px">
           <v-card>
             <v-card-title>
               <span class="headline">Notificar situación</span>
             </v-card-title>
             <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" sm="8" md="8">
-                  <v-text-field
-                      v-model="mapPointText"
-                      :counter="50"
-                      autocomplete="off"
-                      label="Describa la situación*"
-                      :error-messages="errorMapPointTexField"
-                  ></v-text-field>
-                </v-col>
-                </v-row>
-              </v-container>
-              <small>* Campos requeridos</small>
+              <v-textarea
+                  background-color="#424240 "
+                  v-model="mapPointText"
+                  autocomplete="off"
+                  label="Describa la situación*"
+                  rows="1"
+                  auto-grow
+                  :error-messages="errorMapPointTexField"
+              ></v-textarea>
+
+              <v-data-table
+                  v-model="TextMapPointSelected"
+                  :headers="headers"
+                  :items="descriptionMapPointData"
+                  :single-select="singleSelect"
+                  item-key="text"
+                  show-select
+                  hide-default-footer
+              >
+              </v-data-table>
             </v-card-text>
             <v-card-actions :class="['mb-2', 'pa-1', 'mr-3']">
               <v-spacer></v-spacer>
@@ -115,7 +121,8 @@
                   color="primary"
                   text
                   v-on:click="validateMapPoint()"
-              >Enviar</v-btn
+              >Enviar
+              </v-btn
               >
               <v-btn color="primary" text @click="onClose()">Cancelar</v-btn>
             </v-card-actions>
@@ -141,9 +148,36 @@ export default {
       dialogExitIncidentStatus: false,
       showMapPointSelector: false,
       mapPointText: '',
-      mapPointTextRules:[ v => !!v || "El texto es obligatorio"],
+      mapPointTextRules: [v => !!v || "El texto es obligatorio"],
       errorMapPointTexField: null,
-      descriptionMapPoints: []
+      descriptionMapPoints: [],
+      loadingTable: false,
+      TextMapPointSelected: [],
+      singleSelect: true,
+      descriptionMapPointData: [],
+      headers: [
+        {
+          text: "mensaje",
+          align: "start",
+          sortable: false,
+          value: "text"
+        }
+      ],
+    }
+  },
+  watch: {
+    TextMapPointSelected() {
+      if(this.TextMapPointSelected.length > 0)
+      {
+        this.mapPointText = this.TextMapPointSelected[0].text;
+      }
+      else
+      {
+        this.mapPointText = "";
+      }
+
+
+
     }
   },
   methods: {
@@ -213,99 +247,104 @@ export default {
       this.showMapPointSelector = true
 
     },
-    async validateMapPoint(){
+    async validateMapPoint() {
 
-      await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
-
-            let incidentsArray =  response.data.incidentAbstractions;
-
-        incidentsArray.forEach(incident =>  {
-            if(incident.name === this.resourceDataIncidentData.incidentName)
-            {
-              this.descriptionMapPoints  =  incident.types.descriptions
-
-            }
-            else
-            {
-             incident.types.forEach(typeIncident =>{
-               if(typeIncident.name === this.resourceDataIncidentData.incidentName)
-               {
-                 console.log(typeIncident.descriptions)
-                 this.descriptionMapPoints = typeIncident.descriptions
-               }
-             })
-            }
-        })
-
-        console.log( this.descriptionMapPoints.length )
-      })
-
-      if(this.mapPointText === '')
+    /*  if (this.TextMapPointSelected.length ==! 0)
       {
-        this.errorMapPointTexField = 'Debe escribir una descripción '
+        console.log(this.TextMapPointSelected)
       }
       else
-      {
-        this.errorMapPointTexField = null;
-        await this.$store
-            .dispatch("incident/postMapPointResource",
-                {
-                  incident_id: this.resourceDataIncidentData.incidentId,
-                  resource_id: this.userInformation.resourceId,
-                  comment: this.mapPointText,
-                  location: [-62.490234, -30.675715] ,
-                  time_created: new Date()
-                })
-            .then( ()=> {
-              this.$store.commit("uiParams/dispatchAlert", {
-                text: "Se ha enviado el map point ",
-                color: "success",
-                timeout: 4000
-              });
-              this.showMapPointSelector = false;
-            })
-            .catch(e => {
-              console.error(e);
+      {*/
+        await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
 
-              this.$store.commit("uiParams/dispatchAlert", {
-                text: "Hubo un problema para enviar el map point",
-                color: "primary",
-                timeout: 4000
-              });
-            })
+          let incidentsArray = response.data.incidentAbstractions;
+
+          incidentsArray.forEach(incident => {
+            if (incident.name === this.resourceDataIncidentData.incidentName) {
+              this.descriptionMapPoints = incident.types.descriptions
+            } else {
+
+              incident.types.forEach(typeIncident => {
+                if (typeIncident.name === this.resourceDataIncidentData.incidentName) {
+                  this.descriptionMapPoints = typeIncident.descriptions;
+                  //    this.descriptionMapPoints[0].text = 'asd'
+                  this.descriptionMapPointData = this.descriptionMapPoints;
+                  this.descriptionMapPointData.push({text: 'asdasd asdasd asdasd asdasd asdasd asdasd asdasd asdasd asdasd '})
+
+                }
+              })
+            }
+          })
+
+        })
+
+        if (this.mapPointText === '') {
+          this.errorMapPointTexField = 'Debe escribir una descripción '
+        } else {
+          this.errorMapPointTexField = null;
+          await this.$store
+              .dispatch("incident/postMapPointResource",
+                  {
+                    incident_id: this.resourceDataIncidentData.incidentId,
+                    resource_id: this.userInformation.resourceId,
+                    comment: this.mapPointText,
+                    location: [-62.490234, -30.675715],
+                    time_created: new Date()
+                  })
+              .then(() => {
+                this.$store.commit("uiParams/dispatchAlert", {
+                  text: "Se ha enviado el map point ",
+                  color: "success",
+                  timeout: 4000
+                });
+                this.showMapPointSelector = false;
+              })
+              .catch(e => {
+                console.error(e);
+
+                this.$store.commit("uiParams/dispatchAlert", {
+                  text: "Hubo un problema para enviar el map point",
+                  color: "primary",
+                  timeout: 4000
+                });
+              })
+
       }
 
+
     },
-    onClose(){
+    onClose() {
       this.showMapPointSelector = false;
+      this.TextMapPointSelected = [];
       this.mapPointText = '';
       this.errorMapPointTexField = null;
     },
     seeIncidentLocation() {
       console.log("Aqui iria un mapa de la incidencia")
     },
-    async changeStateConfirmationExitToIncident()
-    { await this.$store
-        .dispatch("incident/deleteResourceIncident", this.userInformation)
-        .then(() => {
-          this.$router.push({name: "ActiveIncidents"});
+    async changeStateConfirmationExitToIncident() {
+      await this.$store
+          .dispatch("incident/deleteResourceIncident", this.userInformation)
+          .then(() => {
+            this.$router.push({name: "ActiveIncidents"});
 
-          this.$store.commit("uiParams/dispatchAlert", {
-            text: "Se lo quito del incidente correctamente",
-            color: "success",
-            timeout: 4000
-          });
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Se lo quito del incidente correctamente",
+              color: "success",
+              timeout: 4000
+            });
 
-        })
-        .catch(e => {
-          console.error(e);
-          this.$store.commit("uiParams/dispatchAlert", {
-            text: "No se pudo quitar del incidente",
-            color: "primary",
-            timeout: 4000
-          });
+          })
+          .catch(e => {
+            console.error(e);
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "No se pudo quitar del incidente",
+              color: "primary",
+              timeout: 4000
+            });
 
-        })}
+          })
+    }
   },
   computed: {
     ...mapGetters({
