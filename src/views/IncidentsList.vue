@@ -209,6 +209,7 @@ export default {
     let incidentInformation = {
       incidentId: this.incidentSelected.id,
       resourceId: this.userInformation.resourceId,
+      incidentName: this.incidentSelected.incident_type.name
     };
       await this.$store
           .dispatch("incident/postResourceIncident", incidentInformation)

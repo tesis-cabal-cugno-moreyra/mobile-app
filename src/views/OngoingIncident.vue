@@ -157,7 +157,7 @@ export default {
       descriptionMapPointData: [],
       headers: [
         {
-          text: "mensaje",
+        //  text: "mensaje",
           align: "start",
           sortable: false,
           value: "text"
@@ -170,14 +170,16 @@ export default {
       if(this.TextMapPointSelected.length > 0)
       {
         this.mapPointText = this.TextMapPointSelected[0].text;
+        this.errorMapPointTexField = null;
       }
       else
       {
         this.mapPointText = "";
       }
-
-
-
+    },
+    showMapPointSelector()
+    {
+      this.getMapPointTexts();
     }
   },
   methods: {
@@ -249,38 +251,11 @@ export default {
     },
     async validateMapPoint() {
 
-    /*  if (this.TextMapPointSelected.length ==! 0)
-      {
-        console.log(this.TextMapPointSelected)
-      }
-      else
-      {*/
-        await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
-
-          let incidentsArray = response.data.incidentAbstractions;
-
-          incidentsArray.forEach(incident => {
-            if (incident.name === this.resourceDataIncidentData.incidentName) {
-              this.descriptionMapPoints = incident.types.descriptions
-            } else {
-
-              incident.types.forEach(typeIncident => {
-                if (typeIncident.name === this.resourceDataIncidentData.incidentName) {
-                  this.descriptionMapPoints = typeIncident.descriptions;
-                  //    this.descriptionMapPoints[0].text = 'asd'
-                  this.descriptionMapPointData = this.descriptionMapPoints;
-                  this.descriptionMapPointData.push({text: 'asdasd asdasd asdasd asdasd asdasd asdasd asdasd asdasd asdasd '})
-
-                }
-              })
-            }
-          })
-
-        })
 
         if (this.mapPointText === '') {
-          this.errorMapPointTexField = 'Debe escribir una descripción '
-        } else {
+          this.errorMapPointTexField = 'Debe escribir o seleccionar una descripción '
+        }
+        else {
           this.errorMapPointTexField = null;
           await this.$store
               .dispatch("incident/postMapPointResource",
@@ -309,9 +284,34 @@ export default {
                 });
               })
 
-      }
+        }
 
 
+
+    },
+    async getMapPointTexts() {
+      await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
+
+        let incidentsArray = response.data.incidentAbstractions;
+        console.log(incidentsArray)
+        console.log( this.resourceDataIncidentData.incidentName)
+        console.log( this.resourceDataIncidentData)
+
+        incidentsArray.forEach(incident => {
+          if (incident.name === this.resourceDataIncidentData.incidentName) {
+            this.descriptionMapPoints = incident.types.descriptions
+          } else {
+              incident.types.forEach(typeIncident => {
+                if (typeIncident.name === this.resourceDataIncidentData.incidentName) {
+                 this.descriptionMapPoints = typeIncident.descriptions;
+                 this.descriptionMapPointData = this.descriptionMapPoints;
+                 this.descriptionMapPointData.push({text: 'asdasd asdasd asdasd asdasd '})
+              }
+            })
+          }
+        })
+
+      })
     },
     onClose() {
       this.showMapPointSelector = false;
