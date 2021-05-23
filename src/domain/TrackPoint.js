@@ -1,19 +1,23 @@
 import { Point } from "@/domain/Point"
 
 export class TrackPoint extends Point {
-  constructor(coordinates, resourceId) {
+  constructor(coordinates, resourceId, incidentId) {
     super(coordinates);
-    this.collectedAt = new Date();
+    this.timeCreated = new Date().toISOString();
     this.internalType = "TrackPoint";
     this.resourceId = resourceId;
+    this.incidentId = incidentId;
   }
-  getCollectedAt(){
-    return this.collectedAt;
+  getTimeCreated() {
+    return this.timeCreated;
   }
-  getInternalType(){
+  getInternalType() {
     return this.internalType;
   }
-  getResourceId(){
+  getResourceId() {
     return this.resourceId;
+  }
+  getIncidentId() {
+    return this.incidentId;
   }
 }

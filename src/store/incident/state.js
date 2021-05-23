@@ -2,8 +2,7 @@ export default {
     incidentUserData: {
         resourceId: localStorage.getItem("resourceId"),
         incidentId: localStorage.getItem("incidentId"),
-        incidentName: null
-
+        incident: undefined,
     },
     showResourceToContainResource: {
         visible: false,

@@ -41,6 +41,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <service
+                android:name="com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService"
+                android:enabled="true"
+                android:exported="true"
+                android:foregroundServiceType="location" />
     </application>
 
     <!-- Permissions -->
@@ -61,4 +67,6 @@
     <!-- Audio -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <!-- Background -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 </manifest>

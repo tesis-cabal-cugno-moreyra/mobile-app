@@ -20,7 +20,7 @@
           <div class="my-8">
             <v-btn
                 min-width="300"
-                @click="insertMapPoint()"
+                @click="dialogMapPoint = true"
                 color="primary"
                 class="pa-5"
             >Notificar situación
@@ -86,52 +86,116 @@
       </v-col>
     </v-row>
 
-    <v-form ref="form" lazy-validation>
-      <v-row>
-        <v-dialog v-model="showMapPointSelector" max-width="300px">
-          <v-card>
-            <v-card-title>
-              <span class="headline">Notificar situación</span>
-            </v-card-title>
-            <v-card-text>
-              <v-textarea
-                  background-color="#424240 "
-                  v-model="mapPointText"
-                  autocomplete="off"
-                  label="Describa la situación*"
-                  rows="1"
-                  auto-grow
-                  :error-messages="errorMapPointTexField"
-              ></v-textarea>
+    <v-dialog
+      v-model="dialogMapPoint"
+      width="500"
+    >
+      <v-card>
+        <v-form ref="mapPointForm" lazy-validation>
+          <v-card-title>
+            Notificar situación
+          </v-card-title>
 
-              <v-data-table
-                  v-model="TextMapPointSelected"
-                  :headers="headers"
-                  :items="descriptionMapPointData"
-                  :single-select="singleSelect"
-                  item-key="text"
-                  show-select
-                  hide-default-footer
-              >
-              </v-data-table>
-            </v-card-text>
-            <v-card-actions :class="['mb-2', 'pa-1', 'mr-3']">
-              <v-spacer></v-spacer>
-              <v-btn
-                  color="primary"
-                  text
-                  v-on:click="validateMapPoint()"
-              >Enviar
-              </v-btn
-              >
-              <v-btn color="primary" text @click="onClose()">Cancelar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-row>
-    </v-form>
+          <v-divider></v-divider>
 
+          <v-card-text>
+            <v-textarea
+                label="Texto descriptivo de la situación *"
+                required
+                autocomplete="off"
+                v-model="mapPointComment"
+                :rules="mapPointCommentRules"
+                :error-messages="errorMapPointCommentField"
+            ></v-textarea>
+            <v-data-table
+                v-model="TextMapPointSelected"
+                :headers="headers"
+                :items="descriptionMapPointData"
+                :single-select="singleSelect"
+                item-key="text"
+                show-select
+                hide-default-footer
+            >
+            </v-data-table>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn
+                color="primary"
+                text
+                @click="insertMapPoint"
+                :loading="loadingSendMapPoint"
+            >
+              Enviar
+            </v-btn>
+            <v-btn
+                color="primary"
+                text
+                @click="dialogMapPoint = false"
+                :loading="loadingSendMapPoint"
+            >
+              Volver
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
+      v-model="dialogMap"
+      width="500"
+    >
+      <v-card>
+        <v-card-title>
+          Ubicación del Incidente
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text>
+          <v-img>
+            <l-map
+                :zoom="15"
+                :center="mapCenter"
+                :options="{ zoomSnap: 0.5 }"
+                style="z-index: 0; height: 65vh; width: 100%; margin-top: 16px"
+                ref="incidentLocationMap"
+            >
+              <l-tile-layer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <l-marker :lat-lng="mapCenter">
+                <l-popup>
+                  <div>
+                    Ubicación del Incidente
+                  </div>
+                </l-popup>
+              </l-marker>
+
+            </l-map>
+          </v-img>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              color="primary"
+              text
+              @click="dialogMap = false"
+          >
+            Volver a la vista principal
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <resourceAbleToContainResourceList></resourceAbleToContainResourceList>
+    <background-geolocation
+        :resource-id="incidentUserData.resourceId"
+        :incident-id="incidentUserData.incidentId"
+    ></background-geolocation>
   </v-container>
 </template>
 
@@ -139,13 +203,28 @@
 import {mapGetters} from "vuex";
 import resourceAbleToContainResourceList from "../components/ResourceAbleToContainResourceList.vue";
 import NavBar from "../components/NavBar";
+import {LatLng} from "leaflet/dist/leaflet-src.esm";
+import geolocationServices from "@/services/geolocationServices";
+import {MapPoint} from "@/domain/MapPoint";
+import BackgroundGeolocation from "@/components/BackgroundGeolocation";
+import PointAPIManager from "@/services/PointAPIManager";
 
 export default {
   name: "OngoingIncident",
-  components: {NavBar, resourceAbleToContainResourceList},
+  components: {BackgroundGeolocation, NavBar, resourceAbleToContainResourceList},
   data() {
     return {
       dialogExitIncidentStatus: false,
+      dialogMap: false,
+      dialogMapPoint: false,
+      mapCenter: new LatLng(0,0),
+      loadingSendMapPoint: false,
+      mapPointComment: '',
+      mapPointCommentRules: [
+        v => !!v || "El comentario es obligatorio",
+      ],
+      errorMapPointCommentField: null,
+      pointApiManager: new PointAPIManager(this),
       showMapPointSelector: false,
       mapPointText: '',
       mapPointTextRules: [v => !!v || "El texto es obligatorio"],
@@ -157,7 +236,7 @@ export default {
       descriptionMapPointData: [],
       headers: [
         {
-        //  text: "mensaje",
+          //  text: "mensaje",
           align: "start",
           sortable: false,
           value: "text"
@@ -193,101 +272,106 @@ export default {
       let idContainerResource = null;
 
       await this.$store
-          .dispatch("incident/getResourceVehicleIncident",
-              {
-                incident_id: this.resourceDataIncidentData.incidentId,
-                username_Resource: username,
-                resource_to_contain_resources: 'false',
-                has_container_resource: 'false'
-              })
-          .then(response => {
-            if (response.data.results[0].container_resource !== null) {
-              idContainerResource = response.data.results[0].container_resource.id;
-            }
-          })
-          .catch(e => {
-            console.error(e);
-          })
+        .dispatch("incident/getResourceVehicleIncident",
+            {
+              incident_id: this.incidentUserData.incidentId,
+              username_Resource: username,
+              resource_to_contain_resources: 'false',
+              has_container_resource: 'false'
+            })
+        .then(response => {
+          if (response.data.results[0].container_resource !== null) {
+            idContainerResource = response.data.results[0].container_resource.id;
+          }
+        })
+        .catch(e => {
+          console.error(e);
+        })
 
       await this.$store
-          .dispatch("incident/getResourceVehicleIncident",
-              {
-                incident_id: this.resourceDataIncidentData.incidentId,
-                username_Resource: '',
-                resource_to_contain_resources: 'true'
-              })
-          .then(response => {
-            if (response.data.count === 0) {
-              this.$store.commit("uiParams/dispatchAlert", {
-                text: "De momento no hay vehiculos vinculados al incidente",
-                color: "primary",
-                timeout: 4000
-              });
-            } else {
-              this.$store.commit(
-                  "incident/changeVisibilityResourceToContainResource",
-                  {
-                    resourceToContainResource: response.data,
-                    idContainerResource: idContainerResource
-                  }
-              );
-            }
-          })
-          .catch(e => {
-            console.error(e);
+        .dispatch("incident/getResourceVehicleIncident",
+            {
+              incident_id: this.incidentUserData.incidentId,
+              username_Resource: '',
+              resource_to_contain_resources: 'true'
+            })
+        .then(response => {
+          if (response.data.count === 0) {
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "Hubo un problema para encontrar vehiculos vinculados al incidente",
+              text: "De momento no hay vehiculos vinculados al incidente",
               color: "primary",
               timeout: 4000
             });
-
+          } else {
+            this.$store.commit(
+                "incident/changeVisibilityResourceToContainResource",
+                {
+                  resourceToContainResource: response.data,
+                  idContainerResource: idContainerResource
+                }
+            );
+          }
           })
+        .catch(e => {
+          console.error(e);
+          this.$store.commit("uiParams/dispatchAlert", {
+            text: "Hubo un problema para encontrar vehiculos vinculados al incidente",
+            color: "primary",
+            timeout: 4000
+          });
 
+        })
     },
-
-    insertMapPoint() {
-      this.showMapPointSelector = true
-
-    },
-    async validateMapPoint() {
+    async insertMapPoint() {
+      this.loadingSendMapPoint = true;
+      this.errorMapPointCommentField = null;
+      let isValid = this.$refs.mapPointForm.validate();
 
 
-        if (this.mapPointText === '') {
-          this.errorMapPointTexField = 'Debe escribir o seleccionar una descripción '
-        }
-        else {
-          this.errorMapPointTexField = null;
-          await this.$store
-              .dispatch("incident/postMapPointResource",
-                  {
-                    incident_id: this.resourceDataIncidentData.incidentId,
-                    resource_id: this.userInformation.resourceId,
-                    comment: this.mapPointText,
-                    location: [-62.490234, -30.675715],
-                    time_created: new Date()
-                  })
-              .then(() => {
-                this.$store.commit("uiParams/dispatchAlert", {
-                  text: "Se ha enviado el map point ",
-                  color: "success",
-                  timeout: 4000
-                });
-                this.showMapPointSelector = false;
-              })
-              .catch(e => {
-                console.error(e);
+      if (!isValid) {
+        this.$store.commit("uiParams/dispatchAlert", {
+          text: "Debe rellenar todos los campos necesarios",
+          color: "primary"
+        });
+        return
+      }
 
-                this.$store.commit("uiParams/dispatchAlert", {
-                  text: "Hubo un problema para enviar el map point",
-                  color: "primary",
-                  timeout: 4000
-                });
-              })
+      let currentPosition = await geolocationServices.getCurrentPosition();
+      await this.pointApiManager.handlePoint(new MapPoint(
+          currentPosition.coords, this.incidentUserData.resourceId,
+          this.incidentUserData.incidentId, this.mapPointComment
+      ))
+      .then(() => {
+          this.$store.commit("uiParams/dispatchAlert", {
+            text: "Se ha enviado el map point ",
+            color: "success",
+            timeout: 4000
+          });
+          this.showMapPointSelector = false;
+        })
+            .catch(e => {
+              console.error(e);
 
-        }
-
-
-
+              this.$store.commit("uiParams/dispatchAlert", {
+                text: "Hubo un problema para enviar el map point",
+                color: "primary",
+                timeout: 4000
+              });
+            })
+      this.dialogMapPoint = false;
+      this.loadingSendMapPoint = false;
+      },
+    seeIncidentLocation() {
+      this.mapCenter = new LatLng(
+          this.incidentUserData.incident.locationPoint.coordinates[0],
+          this.incidentUserData.incident.locationPoint.coordinates[1]
+      )
+      this.dialogMap = true
+      // This is a fix to show the map correctly, being a part of the map component.
+      setTimeout(() => {
+        //mapObject is a property that is part of leaflet
+        this.$refs.incidentLocationMap.mapObject.invalidateSize();
+      }, 100);
     },
     async getMapPointTexts() {
       await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
@@ -301,11 +385,11 @@ export default {
           if (incident.name === this.resourceDataIncidentData.incidentName) {
             this.descriptionMapPoints = incident.types.descriptions
           } else {
-              incident.types.forEach(typeIncident => {
-                if (typeIncident.name === this.resourceDataIncidentData.incidentName) {
-                 this.descriptionMapPoints = typeIncident.descriptions;
-                 this.descriptionMapPointData = this.descriptionMapPoints;
-                 this.descriptionMapPointData.push({text: 'asdasd asdasd asdasd asdasd '})
+            incident.types.forEach(typeIncident => {
+              if (typeIncident.name === this.resourceDataIncidentData.incidentName) {
+                this.descriptionMapPoints = typeIncident.descriptions;
+                this.descriptionMapPointData = this.descriptionMapPoints;
+                this.descriptionMapPointData.push({text: 'asdasd asdasd asdasd asdasd '})
               }
             })
           }
@@ -319,14 +403,11 @@ export default {
       this.mapPointText = '';
       this.errorMapPointTexField = null;
     },
-    seeIncidentLocation() {
-      console.log("Aqui iria un mapa de la incidencia")
-    },
     async changeStateConfirmationExitToIncident() {
       await this.$store
-          .dispatch("incident/deleteResourceIncident", this.userInformation)
-          .then(() => {
-            this.$router.push({name: "ActiveIncidents"});
+        .dispatch("incident/deleteResourceIncident", this.incidentUserData)
+        .then(() => {
+          this.$router.push({name: "ActiveIncidents"});
 
             this.$store.commit("uiParams/dispatchAlert", {
               text: "Se lo quito del incidente correctamente",
@@ -348,9 +429,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      userInformation: "incident/incidentUserData",
-      resourceDataIncidentData: "incident/incidentUserData"
-
+      incidentUserData: "incident/incidentUserData",
     })
   }
 

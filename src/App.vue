@@ -49,8 +49,7 @@ export default {
 
     this.token = localStorage.getItem("access-token");
 
-    if(this.token !== 'null')
-    {
+    if(this.token !== 'null') {
       const dataResource = localStorage.getItem("user");
       const resourceObject = JSON.parse(dataResource)
       const resource_id = resourceObject.resourceId
@@ -61,11 +60,8 @@ export default {
       );
 
     await this.$store.dispatch("restAuth/updateUser", resourceObject);
-    }
-    else
-    {
-      if(window.location.pathname !== '/login')
-      {
+    } else {
+      if(window.location.pathname !== '/login') {
         await this.$router.push({name: "Login"});
       }
     }

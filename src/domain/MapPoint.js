@@ -1,23 +1,27 @@
 import { Point } from "@/domain/Point"
 
 export class MapPoint extends Point {
-  constructor(coordinates, resourceId, comment) {
+  constructor(coordinates, resourceId, incidentId, comment) {
     super(coordinates);
-    this.collectedAt = new Date();
-    this.internalType = "MapPoint"
-    this.resourceId = resourceId
-    this.comment = comment
+    this.timeCreated = new Date().toISOString();
+    this.internalType = "MapPoint";
+    this.resourceId = resourceId;
+    this.incidentId = incidentId;
+    this.comment = comment;
   }
-  getCollectedAt(){
-    return this.collectedAt;
+  getTimeCreated() {
+    return this.timeCreated;
   }
-  getInternalType(){
+  getInternalType() {
     return this.internalType;
   }
-  getResourceId(){
+  getResourceId() {
     return this.resourceId;
   }
-  getComment(){
+  getIncidentId() {
+    return this.incidentId;
+  }
+  getComment() {
     return this.comment;
   }
 }
