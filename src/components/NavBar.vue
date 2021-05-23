@@ -39,6 +39,12 @@
         >
       </v-list-item>
 
+      <v-list-item link v-if="isDebugMode" v-on:click="goToTestView">
+        <v-list-item-icon>
+          <v-icon color="grey darken-1">mdi-tune</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title class="grey--text text--darken-1" >Vista de Pruebas (debug)</v-list-item-title>
+      </v-list-item>
 
       <v-switch
           class="ml-4"
@@ -109,12 +115,18 @@ export default {
     },
     incidentList(){
       this.$router.push({ name: "ActiveIncidents" });
+    },
+    goToTestView(){
+      this.$router.push({ name: "Debug" })
     }
   },
   computed: {
     ...mapGetters({
       showEditUser: "uiParams/showEditUser",
-    })
+    }),
+    isDebugMode() {
+      return !!process.env.VUE_APP_DEBUG_MODE
+    }
   }
 }
 </script>

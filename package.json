@@ -10,6 +10,7 @@
     "capacitor:serve": "vue-cli-service capacitor:serve"
   },
   "dependencies": {
+    "@capacitor-community/background-geolocation": "^0.3.11",
     "@capacitor/android": "^2.0.0",
     "@capacitor/cli": "^2.0.0",
     "@capacitor/core": "^2.0.0",
@@ -18,11 +19,13 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "highlight.js": "^10.4.1",
+    "leaflet": "^1.7.1",
     "roboto-fontface": "*",
     "uuid": "^8.3.2",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
     "vue-router": "^3.2.0",
+    "vue2-leaflet": "^2.7.0",
     "vuetify": "^2.2.11",
     "vuex": "^3.6.0"
   },
