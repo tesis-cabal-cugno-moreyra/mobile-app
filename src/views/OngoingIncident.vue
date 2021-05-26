@@ -100,11 +100,12 @@
 
           <v-card-text>
             <v-textarea
-                label="Texto descriptivo de la situación *"
+                label="Describa la situación *"
                 required
                 autocomplete="off"
                 v-model="mapPointComment"
-                :rules="mapPointCommentRules"
+                auto-grow
+                rows="1"
                 :error-messages="errorMapPointCommentField"
             ></v-textarea>
             <v-data-table
@@ -184,7 +185,7 @@
           <v-btn
               color="primary"
               text
-              @click="dialogMap = false"
+              @click="onClose()"
           >
             Volver a la vista principal
           </v-btn>
@@ -219,17 +220,9 @@ export default {
       dialogMapPoint: false,
       mapCenter: new LatLng(0,0),
       loadingSendMapPoint: false,
-      mapPointComment: '',
-      mapPointCommentRules: [
-        v => !!v || "El comentario es obligatorio",
-      ],
       errorMapPointCommentField: null,
       pointApiManager: new PointAPIManager(this),
-      showMapPointSelector: false,
-      mapPointText: '',
-      mapPointTextRules: [v => !!v || "El texto es obligatorio"],
-      errorMapPointTexField: null,
-      descriptionMapPoints: [],
+      mapPointComment: '',
       loadingTable: false,
       TextMapPointSelected: [],
       singleSelect: true,
@@ -248,17 +241,23 @@ export default {
     TextMapPointSelected() {
       if(this.TextMapPointSelected.length > 0)
       {
-        this.mapPointText = this.TextMapPointSelected[0].text;
-        this.errorMapPointTexField = null;
+        this.mapPointComment = this.TextMapPointSelected[0].text;
+        this.errorMapPointCommentField = '';
       }
       else
       {
-        this.mapPointText = "";
+        this.mapPointComment = "";
       }
     },
-    showMapPointSelector()
+    dialogMapPoint()
     {
-      this.getMapPointTexts();
+      if(this.dialogMapPoint === true) {
+        this.getMapPointTexts();
+      }
+      else
+      {
+        this.onClose();
+      }
     }
   },
   methods: {
@@ -322,17 +321,14 @@ export default {
 
         })
     },
+
     async insertMapPoint() {
       this.loadingSendMapPoint = true;
-      this.errorMapPointCommentField = null;
       let isValid = this.$refs.mapPointForm.validate();
 
-
-      if (!isValid) {
-        this.$store.commit("uiParams/dispatchAlert", {
-          text: "Debe rellenar todos los campos necesarios",
-          color: "primary"
-        });
+      if (!isValid || this.mapPointComment === '') {
+        this.errorMapPointCommentField = "Debe describir o seleccionar una descripción"
+        this.loadingSendMapPoint = false;
         return
       }
 
@@ -347,9 +343,10 @@ export default {
             color: "success",
             timeout: 4000
           });
-          this.showMapPointSelector = false;
-        })
+        this.onClose()
+      })
             .catch(e => {
+
               console.error(e);
 
               this.$store.commit("uiParams/dispatchAlert", {
@@ -357,10 +354,11 @@ export default {
                 color: "primary",
                 timeout: 4000
               });
+              this.onClose()
+
             })
-      this.dialogMapPoint = false;
-      this.loadingSendMapPoint = false;
-      },
+
+    },
     seeIncidentLocation() {
       this.mapCenter = new LatLng(
           this.incidentUserData.incident.locationPoint.coordinates[0],
@@ -373,35 +371,37 @@ export default {
         this.$refs.incidentLocationMap.mapObject.invalidateSize();
       }, 100);
     },
+
     async getMapPointTexts() {
+      this.loadingTable = true;
       await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
 
         let incidentsArray = response.data.incidentAbstractions;
-        console.log(incidentsArray)
-        console.log( this.resourceDataIncidentData.incidentName)
-        console.log( this.resourceDataIncidentData)
 
+        // se buscan todos los incidentes y luego los tipos de incidentes para ver cual corresponde al incidente actual
         incidentsArray.forEach(incident => {
-          if (incident.name === this.resourceDataIncidentData.incidentName) {
-            this.descriptionMapPoints = incident.types.descriptions
+          if (incident.name === this.incidentUserData.incident._incidentTypeName) {
+            this.descriptionMapPointData = incident.types.descriptions
           } else {
             incident.types.forEach(typeIncident => {
-              if (typeIncident.name === this.resourceDataIncidentData.incidentName) {
-                this.descriptionMapPoints = typeIncident.descriptions;
-                this.descriptionMapPointData = this.descriptionMapPoints;
-                this.descriptionMapPointData.push({text: 'asdasd asdasd asdasd asdasd '})
+              if (typeIncident.name === this.incidentUserData.incident._incidentTypeName) {
+                this.descriptionMapPointData = typeIncident.descriptions;
               }
             })
           }
         })
 
       })
+      this.loadingTable = false;
     },
     onClose() {
-      this.showMapPointSelector = false;
+      this.dialogMap = false
+      this.loadingSendMapPoint = false;
       this.TextMapPointSelected = [];
-      this.mapPointText = '';
-      this.errorMapPointTexField = null;
+      this.mapPointComment = '';
+      this.errorMapPointCommentField = null;
+      this.dialogMapPoint = false;
+
     },
     async changeStateConfirmationExitToIncident() {
       await this.$store
