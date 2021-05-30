@@ -108,18 +108,25 @@
                 rows="1"
                 :error-messages="errorMapPointCommentField"
             ></v-textarea>
-            <v-data-table
-                v-model="TextMapPointSelected"
-                :headers="headers"
-                :items="descriptionMapPointData"
-                :single-select="singleSelect"
-                item-key="text"
-                show-select
-                hide-default-footer
-            >
-            </v-data-table>
-          </v-card-text>
 
+          </v-card-text>
+          <div>
+          <v-data-table
+              :loadinf="loadingTable"
+              loading-text="Buscando descripciones.. espere"
+              v-model="TextMapPointSelected"
+              :headers="headerPointTexts"
+              :items="descriptionMapPointData"
+              mobile-breakpoint="0"
+              text-center
+              :single-select="singleSelect"
+              item-key="text"
+              :class="['pb-1']"
+              show-select
+              hide-default-footer
+          >
+          </v-data-table>
+            </div>
           <v-card-actions>
             <v-spacer></v-spacer>
 
@@ -202,8 +209,8 @@
 
 <script>
 import {mapGetters} from "vuex";
+import NavBar from "@/components/NavBar";
 import resourceAbleToContainResourceList from "../components/ResourceAbleToContainResourceList.vue";
-import NavBar from "../components/NavBar";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import geolocationServices from "@/services/geolocationServices";
 import {MapPoint} from "@/domain/MapPoint";
@@ -212,7 +219,7 @@ import PointAPIManager from "@/services/PointAPIManager";
 
 export default {
   name: "OngoingIncident",
-  components: {BackgroundGeolocation, NavBar, resourceAbleToContainResourceList},
+  components: {BackgroundGeolocation,NavBar, resourceAbleToContainResourceList},
   data() {
     return {
       dialogExitIncidentStatus: false,
@@ -226,16 +233,22 @@ export default {
       loadingTable: false,
       TextMapPointSelected: [],
       singleSelect: true,
-      descriptionMapPointData: [],
-      headers: [
+      headerPointTexts:[
         {
-          //  text: "mensaje",
+         text: "descripción rápida",
           align: "start",
           sortable: false,
           value: "text"
-        }
-      ],
+        },
+      ]
+      ,
+      descriptionMapPointData: [],
+
+
     }
+  },
+  created(){
+    this.getMapPointTexts();
   },
   watch: {
     TextMapPointSelected() {
@@ -251,10 +264,10 @@ export default {
     },
     dialogMapPoint()
     {
-      if(this.dialogMapPoint === true) {
+      if(this.dialogMapPoint === true && this.descriptionMapPointData ==![]) {
         this.getMapPointTexts();
       }
-      else
+      else if(this.dialogMapPoint === false )
       {
         this.onClose();
       }
@@ -359,6 +372,7 @@ export default {
             })
 
     },
+
     seeIncidentLocation() {
       this.mapCenter = new LatLng(
           this.incidentUserData.incident.locationPoint.coordinates[0],
@@ -377,7 +391,6 @@ export default {
       await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
 
         let incidentsArray = response.data.incidentAbstractions;
-
         // se buscan todos los incidentes y luego los tipos de incidentes para ver cual corresponde al incidente actual
         incidentsArray.forEach(incident => {
           if (incident.name === this.incidentUserData.incident._incidentTypeName) {
@@ -390,10 +403,10 @@ export default {
             })
           }
         })
-
       })
       this.loadingTable = false;
     },
+
     onClose() {
       this.dialogMap = false
       this.loadingSendMapPoint = false;
@@ -403,6 +416,7 @@ export default {
       this.dialogMapPoint = false;
 
     },
+
     async changeStateConfirmationExitToIncident() {
       await this.$store
         .dispatch("incident/deleteResourceIncident", this.incidentUserData)
@@ -414,12 +428,12 @@ export default {
               color: "success",
               timeout: 4000
             });
-
+          this.descriptionMapPointData =[];
           })
           .catch(e => {
             console.error(e);
             this.$store.commit("uiParams/dispatchAlert", {
-              text: "No se pudo quitar del incidente",
+              text: "No se pudo sacarle del incidente",
               color: "primary",
               timeout: 4000
             });

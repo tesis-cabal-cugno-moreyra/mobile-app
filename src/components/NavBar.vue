@@ -7,17 +7,22 @@
           </v-avatar>
         </v-flex>
         <v-flex>
-          <p class="gray--text mt-3 headline">Name Lastname</p>
+          <p class="gray--text mt-3 headline"
+             >
+            {{this.userInformation.lastName}}
+            {{ this.userInformation.firstName }}
+
+          </p>
         </v-flex>
       </v-layout>
       <v-divider></v-divider>
 
-      <v-list-item link>
+      <v-list-item link v-on:click="incidentList">
         <v-list-item-icon>
-          <v-icon color="grey darken-1">mdi-home</v-icon>
+          <v-icon color="grey darken-1">mdi-clipboard-text</v-icon>
         </v-list-item-icon>
         <v-list-item-title class="grey--text text--darken-1"
-        >Página principal</v-list-item-title
+        >Listado de incidentes</v-list-item-title
         >
       </v-list-item>
 
@@ -27,15 +32,6 @@
         </v-list-item-icon>
         <v-list-item-title class="grey--text text--darken-1"
         >Configuración</v-list-item-title
-        >
-      </v-list-item>
-
-      <v-list-item link v-on:click="incidentList">
-        <v-list-item-icon>
-          <v-icon color="grey darken-1">mdi-clipboard-text</v-icon>
-        </v-list-item-icon>
-        <v-list-item-title class="grey--text text--darken-1"
-        >Listado de incidentes</v-list-item-title
         >
       </v-list-item>
 
@@ -114,7 +110,19 @@ export default {
       );
     },
     incidentList(){
-      this.$router.push({ name: "ActiveIncidents" });
+      if(window.location.pathname ==! '/onGoingIncident') {
+        this.$router.push({name: "ActiveIncidents"});
+      }
+      else
+      {
+        this.drawer = false
+
+        this.$store.commit("uiParams/dispatchAlert", {
+          text: "No puede ver el listado de incidentes mientras estes unido a uno",
+          color: "primary",
+          timeout: 4000
+        });
+      }
     },
     goToTestView(){
       this.$router.push({ name: "Debug" })
@@ -123,6 +131,7 @@ export default {
   computed: {
     ...mapGetters({
       showEditUser: "uiParams/showEditUser",
+      userInformation: "restAuth/user",
     }),
     isDebugMode() {
       return !!process.env.VUE_APP_DEBUG_MODE
