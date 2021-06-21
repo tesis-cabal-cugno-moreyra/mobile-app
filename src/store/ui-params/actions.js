@@ -41,7 +41,6 @@ export default {
                         incidentData.cancelled_at,
                         incidentData.finalized_at,
                     )
-                    console.log({incidentData, incident})
                     let incidentInformation = {
                         incidentId: incidentData.id,
                         resourceId: resource_id,
