@@ -65,11 +65,24 @@ export default {
     return new Promise(async (resolve, reject) => {
       try {
         let data =  `/api/v1/incidents/${payload.incident_id}/resources/${payload.resource_id}/`;
-        return resolve(await api.put(data, payload));
+        return resolve(await api.put(data, payload.data));
 
       } catch (e) {
         return reject(e);
       }
     });
   },
+  postMapPointResource(context, payload) {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      try {
+        let data =  `/api/v1/incidents/${payload.incident_id}/resources/${payload.resource_id}/map-point/`;
+        return resolve(await api.post(data, payload));
+
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  },
+
 };
