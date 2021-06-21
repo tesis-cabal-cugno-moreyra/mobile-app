@@ -59,7 +59,7 @@ const routes = [
   },
   {
     path: "/resource_statistics/:id",
-    name: "ResourceStatisticsView",
+    name: "ResourceStatistics",
     component: ResourceStatistics,
     meta: {
       requires_auth: true,

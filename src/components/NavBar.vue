@@ -113,8 +113,7 @@ export default {
       this.logoutModal = true;
     },
     resourceStatistics() {
-      // this.$router.push({ name: "ResourceStatistics, params: { id: this.resourceId } })
-
+      this.$router.push({ name: "ResourceStatistics", params: { id: this.resourceId } })
     },
     editUser() {
       this.$store.dispatch("uiParams/hideNavBar");

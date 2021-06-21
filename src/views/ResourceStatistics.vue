@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <NavBar></NavBar>
     <v-card class="pt-5 pr-1 pl-1 pb-1 mt-5 mr-1 ml-1 mb-1" color="">
       <v-card-title> <h1>Estadísticas por recurso.</h1></v-card-title>
       <v-card-subtitle
@@ -180,11 +181,12 @@
 import LineChart from "@/components/charts/LineChart.vue";
 import PieChart from "@/components/charts/PieChart.vue";
 import BarChart from "@/components/charts/BarChart.vue";
-import { mapGetters } from "vuex";
+import NavBar from "@/components/NavBar";
+// import { mapGetters } from "vuex";
 
 export default {
   name: "ResourceStatistics",
-  components: { BarChart, PieChart, LineChart },
+  components: { NavBar, BarChart, PieChart, LineChart },
   data() {
     return {
       resourceId: null,
@@ -272,8 +274,9 @@ export default {
 
       let context = this;
       await context.$store
-        .dispatch("domainConfig/getIncidentsByResourceId", context.resourceId)
+        .dispatch("statistics/getIncidentsByResourceId", context.resourceId)
         .then(response => {
+          console.log(response)
           let incidents = [];
           this.incidentsAttended = response.data.results.length;
           if (response.data.results !== []) {
@@ -302,13 +305,15 @@ export default {
     async getStatisticsByResource() {
       let context = this;
       await context.$store
-        .dispatch("domainConfig/getStatisticsByResourceId", context.resourceId)
+        .dispatch("statistics/getStatisticsByResourceId", context.resourceId)
         .then(response => {
+          console.log(response)
           context.barChartData = response.data.barChartData;
           context.lineChartDataAnnually = response.data.lineChartDataAnnually;
           context.lineChartDataMonthly = response.data.lineChartDataMonthly;
           context.lineChartDataWeekly = response.data.lineChartDataWeekly;
           context.pieChartData = response.data.pieChartData;
+          console.log(context.barChartData)
         })
         .catch(async () => {
           console.error(
@@ -323,12 +328,12 @@ export default {
       });
     }
   },
-  computed: {
-    ...mapGetters({
-      domainConfig: "domainConfig/domainConfig",
-      incidentConfig: "domainConfig/incidentConfig"
-    })
-  }
+  // computed: {
+  //   ...mapGetters({
+  //     domainConfig: "domainConfig/domainConfig",
+  //     incidentConfig: "domainConfig/incidentConfig"
+  //   })
+  // }
 };
 </script>
 
