@@ -15,6 +15,8 @@ import networkServices from "@/services/networkServices";
 import appServices from "@/services/appServices";
 import authServices from "@/services/authServices";
 import storageServices from "@/services/storageServices";
+import {mapGetters} from "vuex";
+import { SplashScreen } from "@capacitor/core";
 
 export default {
   name: 'App',
@@ -24,7 +26,8 @@ export default {
   },
   data() {
     return {
-      logoutModal: false
+      logoutModal: false,
+      token: null
     };
   },
   async beforeCreate() {
@@ -36,15 +39,40 @@ export default {
         localStorage.setItem("access-token", response.data.access)
       })
     }
+    await SplashScreen.hide();
   },
   async created() {
     let context = this;
     await this.$store.dispatch("fcmConfiguration/configPushNotifications");
     await networkServices.listenNetworkStatus(context);
     appServices.listenAppStatus(context);
+
+    this.token = localStorage.getItem("access-token");
+
+    if(this.token !== 'null') {
+      const dataResource = localStorage.getItem("user");
+      const resourceObject = JSON.parse(dataResource)
+      const resource_id = resourceObject.resourceId
+
+      await this.$store.dispatch(
+          "uiParams/redirectToHomePage",
+          { data: {resource_id},vueRouter: this.$router }
+      );
+
+    await this.$store.dispatch("restAuth/updateUser", resourceObject);
+    } else {
+      if(window.location.pathname !== '/login') {
+        await this.$router.push({name: "Login"});
+      }
+    }
   },
   async mounted() {
     this.$vuetify.theme.dark = true;
+  },
+  computed: {
+    ...mapGetters({
+      userData: "restAuth/user"
+    })
   }
 };
 </script>

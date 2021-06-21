@@ -33,6 +33,19 @@ export default {
   },
   async getKeys() {
     const { keys } = await Storage.keys()
+
+    // Remove access token key
+    let accessTokenIndex = keys.indexOf("access-token");
+    if (accessTokenIndex > -1) {
+      keys.splice(accessTokenIndex, 1);
+    }
+
+    // Remove refresh token key
+    let refreshTokenIndex = keys.indexOf("refresh-token");
+    if (refreshTokenIndex > -1) {
+      keys.splice(refreshTokenIndex, 1);
+    }
+
     return keys;
   },
   async setPoint(point, vueContext) {
@@ -40,7 +53,9 @@ export default {
       key: uuidv4(),
       value: JSON.stringify(point)
     })
-    await vueContext.$store.dispatch("mobileEventsStatus/increaseByOneStoredPointsCounter");
+    if (vueContext && vueContext.$store) {
+      await vueContext.$store.dispatch("mobileEventsStatus/increaseByOneStoredPointsCounter");
+    }
   },
   async getPoint(pointKey) {
     const point = await Storage.get({ key: pointKey});
@@ -58,10 +73,17 @@ export default {
   },
   async removePoint(pointKey, vueContext) {
     await Storage.remove({ key: pointKey});
-    await vueContext.$store.dispatch("mobileEventsStatus/decreaseByOneStoredPointsCounter");
+    console.log(`removePoint: Removed ${pointKey} from storage`)
+    // This should be needed? DELETE later
+    if (vueContext && vueContext.$store) {
+      await vueContext.$store.dispatch("mobileEventsStatus/decreaseByOneStoredPointsCounter");
+    }
   },
   async clear(vueContext) {
     await Storage.clear();
-    await vueContext.$store.dispatch("mobileEventsStatus/resetStoredPointsCounter");
+    // This should be needed? DELETE later
+    if (vueContext && vueContext.$store) {
+      await vueContext.$store.dispatch("mobileEventsStatus/resetStoredPointsCounter");
+    }
   }
 };

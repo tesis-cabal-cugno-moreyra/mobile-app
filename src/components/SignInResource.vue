@@ -145,8 +145,17 @@ export default {
   async mounted() {
     if (this.typeResourceSelectedList.length === 0) {
       this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
-        this.typeResourceSelectedList =
-            response.data.incidentAbstractions[1].types[0].resourceTypes;
+        let incidentAbstractions = response.data.incidentAbstractions;
+        let resourceTypes = [];
+        incidentAbstractions.forEach(incidentAbstraction => {
+          incidentAbstraction.types.forEach(incidentType => {
+            resourceTypes = resourceTypes.concat(incidentType.resourceTypes);
+          });
+        });
+        // Se convierte en json para poder quitar los tipos de recursos repetidos y se vuelve a crear el objeto
+        this.typeResourceSelectedList = [
+          ...new Set(resourceTypes.map(JSON.stringify))
+        ].map(JSON.parse);
       });
     }
     await this.$store
@@ -188,7 +197,7 @@ export default {
               }
               if (responseError.data.username) {
                 if (
-                    responseError.data.username ==
+                    responseError.data.username ===
                     "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters."
                 ) {
                   this.errorUserNameField =
@@ -236,7 +245,8 @@ export default {
               timeout: 5000
             });
           })
-          .catch(async () => {
+          .catch(e => {
+            console.error(e);
             this.$store.commit("uiParams/dispatchAlert", {
               text: "Problemas dentro de la creación del recurso",
               color: "primary"

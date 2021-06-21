@@ -77,7 +77,7 @@ class Api {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       // TODO: Fill headers when needed from localStorage
-      let headers;
+      let headers = {};
 
       let response;
 
@@ -116,11 +116,6 @@ class Api {
 
         return;
       }
-
-      if (STATUS.SERVER_ERROR === error.status) {
-        return window.location.replace("/error/not-found");
-      }
-
       reject(error);
     });
   }
