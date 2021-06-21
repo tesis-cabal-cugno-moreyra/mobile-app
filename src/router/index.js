@@ -10,6 +10,7 @@ import Error from '@/views/Error.vue'
 import IncidentsList from '@/views/IncidentsList.vue'
 import OngoingIncident from '@/views/OngoingIncident.vue'
 import MobileTestView from "@/views/MobileTestView";
+import ResourceStatistics from "@/views/ResourceStatistics";
 
 Vue.use(VueRouter)
 
@@ -55,6 +56,19 @@ const routes = [
       is_supervisor: true,
       is_resource: true
     }
+  },
+  {
+    path: "/resource_statistics/:id",
+    name: "ResourceStatisticsView",
+    component: ResourceStatistics,
+    meta: {
+      requires_auth: true,
+      is_admin: true,
+      is_supervisor: true
+    },
+    props: route => ({
+      ...route.params
+    })
   },
   {
     path: "/login",
