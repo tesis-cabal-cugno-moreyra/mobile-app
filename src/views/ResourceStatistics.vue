@@ -276,7 +276,6 @@ export default {
       await context.$store
         .dispatch("statistics/getIncidentsByResourceId", context.resourceId)
         .then(response => {
-          console.log(response)
           let incidents = [];
           this.incidentsAttended = response.data.results.length;
           if (response.data.results !== []) {
@@ -307,13 +306,11 @@ export default {
       await context.$store
         .dispatch("statistics/getStatisticsByResourceId", context.resourceId)
         .then(response => {
-          console.log(response)
           context.barChartData = response.data.barChartData;
           context.lineChartDataAnnually = response.data.lineChartDataAnnually;
           context.lineChartDataMonthly = response.data.lineChartDataMonthly;
           context.lineChartDataWeekly = response.data.lineChartDataWeekly;
           context.pieChartData = response.data.pieChartData;
-          console.log(context.barChartData)
         })
         .catch(async () => {
           console.error(
