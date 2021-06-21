@@ -20,7 +20,14 @@
         >Página principal</v-list-item-title
         >
       </v-list-item>
-
+      <v-list-item link v-on:click="resourceStatistics">
+        <v-list-item-icon>
+          <v-icon color="grey darken-1">mdi-chart-areaspline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title class="grey--text text--darken-1"
+        >Estadísticas y métricas</v-list-item-title
+        >
+      </v-list-item>
       <v-list-item link v-on:click="editUser">
         <v-list-item-icon>
           <v-icon color="grey darken-1">mdi-settings</v-icon>
@@ -105,6 +112,9 @@ export default {
     openLogoutModal() {
       this.logoutModal = true;
     },
+    resourceStatistics() {
+      this.$router.push({ name: "ResourceStatistics", params: { id: this.resourceId } })
+    },
     editUser() {
       this.$store.dispatch("uiParams/hideNavBar");
 
@@ -113,16 +123,17 @@ export default {
           !this.showEditUser
       );
     },
-    incidentList(){
+    incidentList() {
       this.$router.push({ name: "ActiveIncidents" });
     },
-    goToTestView(){
+    goToTestView() {
       this.$router.push({ name: "Debug" })
     }
   },
   computed: {
     ...mapGetters({
       showEditUser: "uiParams/showEditUser",
+      resourceId: "restAuth/resourceId"
     }),
     isDebugMode() {
       return !!process.env.VUE_APP_DEBUG_MODE
