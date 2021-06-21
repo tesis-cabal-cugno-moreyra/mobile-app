@@ -100,15 +100,33 @@
 
           <v-card-text>
             <v-textarea
-                label="Texto descriptivo de la situación *"
+                label="Describa la situación *"
                 required
                 autocomplete="off"
                 v-model="mapPointComment"
-                :rules="mapPointCommentRules"
+                auto-grow
+                rows="1"
                 :error-messages="errorMapPointCommentField"
             ></v-textarea>
-          </v-card-text>
 
+          </v-card-text>
+          <div>
+          <v-data-table
+              :loadinf="loadingTable"
+              loading-text="Buscando descripciones.. espere"
+              v-model="TextMapPointSelected"
+              :headers="headerPointTexts"
+              :items="descriptionMapPointData"
+              mobile-breakpoint="0"
+              text-center
+              :single-select="singleSelect"
+              item-key="text"
+              :class="['pb-1']"
+              show-select
+              hide-default-footer
+          >
+          </v-data-table>
+            </div>
           <v-card-actions>
             <v-spacer></v-spacer>
 
@@ -174,7 +192,7 @@
           <v-btn
               color="primary"
               text
-              @click="dialogMap = false"
+              @click="onClose()"
           >
             Volver a la vista principal
           </v-btn>
@@ -191,8 +209,8 @@
 
 <script>
 import {mapGetters} from "vuex";
+import NavBar from "@/components/NavBar";
 import resourceAbleToContainResourceList from "../components/ResourceAbleToContainResourceList.vue";
-import NavBar from "../components/NavBar";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import geolocationServices from "@/services/geolocationServices";
 import {MapPoint} from "@/domain/MapPoint";
@@ -201,7 +219,7 @@ import PointAPIManager from "@/services/PointAPIManager";
 
 export default {
   name: "OngoingIncident",
-  components: {BackgroundGeolocation, NavBar, resourceAbleToContainResourceList},
+  components: {BackgroundGeolocation,NavBar, resourceAbleToContainResourceList},
   data() {
     return {
       dialogExitIncidentStatus: false,
@@ -209,12 +227,50 @@ export default {
       dialogMapPoint: false,
       mapCenter: new LatLng(0,0),
       loadingSendMapPoint: false,
-      mapPointComment: '',
-      mapPointCommentRules: [
-        v => !!v || "El comentario es obligatorio",
-      ],
       errorMapPointCommentField: null,
       pointApiManager: new PointAPIManager(this),
+      mapPointComment: '',
+      loadingTable: false,
+      TextMapPointSelected: [],
+      singleSelect: true,
+      headerPointTexts:[
+        {
+         text: "descripción rápida",
+          align: "start",
+          sortable: false,
+          value: "text"
+        },
+      ]
+      ,
+      descriptionMapPointData: [],
+
+
+    }
+  },
+  created(){
+    this.getMapPointTexts();
+  },
+  watch: {
+    TextMapPointSelected() {
+      if(this.TextMapPointSelected.length > 0)
+      {
+        this.mapPointComment = this.TextMapPointSelected[0].text;
+        this.errorMapPointCommentField = '';
+      }
+      else
+      {
+        this.mapPointComment = "";
+      }
+    },
+    dialogMapPoint()
+    {
+      if(this.dialogMapPoint === true && this.descriptionMapPointData ==![]) {
+        this.getMapPointTexts();
+      }
+      else if(this.dialogMapPoint === false )
+      {
+        this.onClose();
+      }
     }
   },
   methods: {
@@ -278,16 +334,14 @@ export default {
 
         })
     },
+
     async insertMapPoint() {
       this.loadingSendMapPoint = true;
-      this.errorMapPointCommentField = null;
       let isValid = this.$refs.mapPointForm.validate();
 
-      if (!isValid) {
-        this.$store.commit("uiParams/dispatchAlert", {
-          text: "Debe rellenar todos los campos necesarios",
-          color: "primary"
-        });
+      if (!isValid || this.mapPointComment === '') {
+        this.errorMapPointCommentField = "Debe describir o seleccionar una descripción"
+        this.loadingSendMapPoint = false;
         return
       }
 
@@ -295,10 +349,30 @@ export default {
       await this.pointApiManager.handlePoint(new MapPoint(
           currentPosition.coords, this.incidentUserData.resourceId,
           this.incidentUserData.incidentId, this.mapPointComment
-      ));
-      this.dialogMapPoint = false;
-      this.loadingSendMapPoint = false;
+      ))
+      .then(() => {
+          this.$store.commit("uiParams/dispatchAlert", {
+            text: "Se ha enviado el map point ",
+            color: "success",
+            timeout: 4000
+          });
+        this.onClose()
+      })
+            .catch(e => {
+
+              console.error(e);
+
+              this.$store.commit("uiParams/dispatchAlert", {
+                text: "Hubo un problema para enviar el map point",
+                color: "primary",
+                timeout: 4000
+              });
+              this.onClose()
+
+            })
+
     },
+
     seeIncidentLocation() {
       this.mapCenter = new LatLng(
           this.incidentUserData.incident.locationPoint.coordinates[0],
@@ -311,28 +385,61 @@ export default {
         this.$refs.incidentLocationMap.mapObject.invalidateSize();
       }, 100);
     },
+
+    async getMapPointTexts() {
+      this.loadingTable = true;
+      await this.$store.dispatch("domainConfig/getDomainConfig").then(response => {
+
+        let incidentsArray = response.data.incidentAbstractions;
+        // se buscan todos los incidentes y luego los tipos de incidentes para ver cual corresponde al incidente actual
+        incidentsArray.forEach(incident => {
+          if (incident.name === this.incidentUserData.incident._incidentTypeName) {
+            this.descriptionMapPointData = incident.types.descriptions
+          } else {
+            incident.types.forEach(typeIncident => {
+              if (typeIncident.name === this.incidentUserData.incident._incidentTypeName) {
+                this.descriptionMapPointData = typeIncident.descriptions;
+              }
+            })
+          }
+        })
+      })
+      this.loadingTable = false;
+    },
+
+    onClose() {
+      this.dialogMap = false
+      this.loadingSendMapPoint = false;
+      this.TextMapPointSelected = [];
+      this.mapPointComment = '';
+      this.errorMapPointCommentField = null;
+      this.dialogMapPoint = false;
+
+    },
+
     async changeStateConfirmationExitToIncident() {
       await this.$store
         .dispatch("incident/deleteResourceIncident", this.incidentUserData)
         .then(() => {
           this.$router.push({name: "ActiveIncidents"});
 
-          this.$store.commit("uiParams/dispatchAlert", {
-            text: "Se lo quito del incidente correctamente",
-            color: "success",
-            timeout: 4000
-          });
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "Se lo quito del incidente correctamente",
+              color: "success",
+              timeout: 4000
+            });
+          this.descriptionMapPointData =[];
+          })
+          .catch(e => {
+            console.error(e);
+            this.$store.commit("uiParams/dispatchAlert", {
+              text: "No se pudo sacarle del incidente",
+              color: "primary",
+              timeout: 4000
+            });
 
-        })
-        .catch(e => {
-          console.error(e);
-          this.$store.commit("uiParams/dispatchAlert", {
-            text: "No se pudo quitar del incidente",
-            color: "primary",
-            timeout: 4000
-          });
-
-        })}
+          })
+    }
   },
   computed: {
     ...mapGetters({

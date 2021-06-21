@@ -77,6 +77,7 @@
 <script>
 import { mapGetters } from "vuex";
 import NavBar from "@/components/NavBar";
+import Incident from "@/domain/Incident";
 export default {
   name: "ActiveIncidents",
   components: {NavBar},
@@ -109,7 +110,7 @@ export default {
         {
           text: "Referencia",
           sortable: false,
-             value: "reference"
+          value: "reference"
 
         },
         {
@@ -206,9 +207,27 @@ export default {
     },
 
   async  enterToIncident(){
+
+     let incident = new Incident(
+         this.incidentSelected.id,
+         this.incidentSelected.domain_config.domain_name,
+         this.incidentSelected.incident_type.name,
+         this.incidentSelected.external_assistance,
+         this.incidentSelected.data_status,
+         this.incidentSelected.status,
+         this.incidentSelected.location_as_string_reference,
+         this.incidentSelected.location_point,
+         this.incidentSelected.reference,
+         this.incidentSelected.created_at,
+         this.incidentSelected.updated_at,
+         this.incidentSelected.cancelled_at,
+         this.incidentSelected.finalized_at,
+    )
+
     let incidentInformation = {
       incidentId: this.incidentSelected.id,
       resourceId: this.userInformation.resourceId,
+      incident
     };
       await this.$store
           .dispatch("incident/postResourceIncident", incidentInformation)
