@@ -64,7 +64,8 @@ const routes = [
     meta: {
       requires_auth: true,
       is_admin: true,
-      is_supervisor: true
+      is_supervisor: true,
+      is_resource: true
     },
     props: route => ({
       ...route.params
