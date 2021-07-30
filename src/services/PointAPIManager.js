@@ -1,8 +1,9 @@
 import storageServices from "@/services/storageServices";
-import webSocketServices from "@/services/webSocketServices";
+import { IncidentSingleWSConnection } from "@/services/webSocketServices";
 export default class PointAPIManager {
-    constructor(vueContext) {
+    constructor(vueContext, incidentId) {
         this._vueContext = vueContext
+        this._incidentWSConnection = new IncidentSingleWSConnection(incidentId, vueContext);
     }
     _validateVueContext() {
         if (!this._vueContext) {
@@ -33,7 +34,7 @@ export default class PointAPIManager {
         if (currentNetworkStatus === 'wifi' || currentNetworkStatus === 'cellular') {
             console.log(`PointAPIManager: Connected network status: ${currentNetworkStatus}`)
             // Try to send with API (current and stored items)
-            webSocketServices.sendPoint(point);
+            this._incidentWSConnection.sendPoint(point, this._vueContext);
         } else if (currentNetworkStatus === 'unknown' || currentNetworkStatus === 'none') {
             console.log(`PointAPIManager: Not Connected network status: ${currentNetworkStatus}`)
             // Save to storage

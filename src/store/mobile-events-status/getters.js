@@ -8,5 +8,8 @@ export default {
   },
   storageStatus(state) {
     return state.storageStatus;
+  },
+  backgroundProcessId(state) {
+    return state.backgroundProcessId;
   }
 };

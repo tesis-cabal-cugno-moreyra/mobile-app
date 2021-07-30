@@ -1,5 +1,5 @@
 import storageServices from "@/services/storageServices";
-import webSocketServices from "@/services/webSocketServices";
+import { sendPointWithWebsocketReconnection } from "@/services/webSocketServices";
 
 export default class ReconnectionPointManager {
     async _sendStoredPoints() {
@@ -7,7 +7,8 @@ export default class ReconnectionPointManager {
         console.log(`ReconnectionPointManager: Points stored to be sent: ${keys.length}`);
         for (const key of keys) {
             let point = await storageServices.getPoint(key);
-            webSocketServices.sendPoint(point);
+            // FIXME: Send point through REST api!
+            sendPointWithWebsocketReconnection(point);
             console.log(`ReconnectionPointManager: Sent stored point ${JSON.stringify(point)} with key ${key}`)
             // FIXME: What do we do if the point is not received by the server?
             await storageServices.removePoint(key, this);

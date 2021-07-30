@@ -104,6 +104,7 @@
                 required
                 autocomplete="off"
                 v-model="mapPointComment"
+                :rules="mapPointCommentRules"
                 auto-grow
                 rows="1"
                 :error-messages="errorMapPointCommentField"
@@ -216,6 +217,7 @@ import geolocationServices from "@/services/geolocationServices";
 import {MapPoint} from "@/domain/MapPoint";
 import BackgroundGeolocation from "@/components/BackgroundGeolocation";
 import PointAPIManager from "@/services/PointAPIManager";
+import {Plugins} from "@capacitor/core";
 
 export default {
   name: "OngoingIncident",
@@ -227,6 +229,9 @@ export default {
       dialogMapPoint: false,
       mapCenter: new LatLng(0,0),
       loadingSendMapPoint: false,
+      mapPointCommentRules: [
+        v => !!v || "El comentario es obligatorio",
+      ],
       errorMapPointCommentField: null,
       pointApiManager: new PointAPIManager(this),
       mapPointComment: '',
@@ -420,7 +425,15 @@ export default {
     async changeStateConfirmationExitToIncident() {
       await this.$store
         .dispatch("incident/deleteResourceIncident", this.incidentUserData)
-        .then(() => {
+        .then(async () => {
+
+          // Buscar ID del background process
+          console.log(this.backgroundProcessId);
+          await Plugins.BackgroundGeolocation.removeWatcher({
+            id: this.backgroundProcessId
+          });
+          await this.$store.dispatch("mobileEventsStatus/deleteBackgroundProcessId")
+          // Eliminar... ver API?
           this.$router.push({name: "ActiveIncidents"});
 
             this.$store.commit("uiParams/dispatchAlert", {
@@ -437,15 +450,14 @@ export default {
               color: "primary",
               timeout: 4000
             });
-
           })
     }
   },
   computed: {
     ...mapGetters({
       incidentUserData: "incident/incidentUserData",
-    })
+      backgroundProcessId: "mobileEventsStatus/backgroundProcessId",
+    }),
   }
-
 }
 </script>

@@ -54,7 +54,7 @@ export default {
   },
   created() {
     // Get stored watcherId, if undefined, start watcher
-    this.pointApiManager = new PointAPIManager(this)
+    this.pointApiManager = new PointAPIManager(this, this.incidentId)
     const context = this;
     const watcherId = BackgroundGeolocation.addWatcher(
         {
@@ -90,7 +90,7 @@ export default {
     // Only one watcher should be active. So, sending the watcher to the store and
     // listening if is active should be a valid solution for that problem
     console.log(watcherId)
-    // this.$store.commit('blablabla', watcherId)
+    this.$store.commit('mobileEventsStatus/updateBackgroundProcessId', watcherId)
   },
 }
 </script>

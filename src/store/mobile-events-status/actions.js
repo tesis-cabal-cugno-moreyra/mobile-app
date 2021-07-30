@@ -34,5 +34,11 @@ export default {
   },
   resetStoredPointsCounter() {
     this.commit("mobileEventsStatus/resetStoredPointsCounter");
+  },
+  saveBackgroundProcessId(context, id) {
+    this.commit("mobileEventsStatus/updateBackgroundProcessId", id);
+  },
+  deleteBackgroundProcessId () {
+    this.commit("mobileEventsStatus/updateBackgroundProcessId", undefined);
   }
 };
