@@ -233,7 +233,6 @@ export default {
         v => !!v || "El comentario es obligatorio",
       ],
       errorMapPointCommentField: null,
-      pointApiManager: new PointAPIManager(this),
       mapPointComment: '',
       loadingTable: false,
       TextMapPointSelected: [],
@@ -245,15 +244,14 @@ export default {
           sortable: false,
           value: "text"
         },
-      ]
-      ,
+      ],
       descriptionMapPointData: [],
-
-
     }
   },
   created(){
     this.getMapPointTexts();
+    // In order to connect to WS
+    console.log(this.pointApiManager);
   },
   watch: {
     TextMapPointSelected() {
@@ -458,6 +456,12 @@ export default {
       incidentUserData: "incident/incidentUserData",
       backgroundProcessId: "mobileEventsStatus/backgroundProcessId",
     }),
+    pointApiManager() {
+      if (!this.incidentUserData.incidentId) {
+        console.error("this.incidentUserData.incidentId is not defined")
+      }
+      return new PointAPIManager(this, this.incidentUserData.incidentId)
+    }
   }
 }
 </script>

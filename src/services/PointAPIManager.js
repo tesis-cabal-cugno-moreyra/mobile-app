@@ -34,7 +34,7 @@ export default class PointAPIManager {
         if (currentNetworkStatus === 'wifi' || currentNetworkStatus === 'cellular') {
             console.log(`PointAPIManager: Connected network status: ${currentNetworkStatus}`)
             // Try to send with API (current and stored items)
-            this._incidentWSConnection.sendPoint(point, this._vueContext);
+            this._incidentWSConnection.sendPoint(point);
         } else if (currentNetworkStatus === 'unknown' || currentNetworkStatus === 'none') {
             console.log(`PointAPIManager: Not Connected network status: ${currentNetworkStatus}`)
             // Save to storage
