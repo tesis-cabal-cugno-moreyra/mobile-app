@@ -42,5 +42,8 @@ export default {
       });
     }
     return false;
+  },
+  resourceId(state) {
+    return state.user.resourceId
   }
 };

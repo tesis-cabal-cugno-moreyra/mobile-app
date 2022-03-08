@@ -8,6 +8,7 @@ import domainConfig from "./domain-config";
 import uiParams from "./ui-params";
 import incident from "./incident";
 import mobileEventsStatus from "./mobile-events-status"
+import statistics from "./statistics"
 
 Vue.use(Vuex)
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
     domainConfig,
     uiParams,
     incident,
-  mobileEventsStatus
+    statistics,
+    mobileEventsStatus
   }
 });
