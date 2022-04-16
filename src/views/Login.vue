@@ -172,15 +172,9 @@ export default {
                   { data: {resource_id},vueRouter: this.$router }
                   );
             })
-            .catch(e => {
-              if (e.status === 400 && e.statusText === "Bad Request") {
-                this.loginError = true;
-                this.errorMessage = "¡Ups! Usuario o contraseña erróneo.";
-              } else {
-                console.error(e);
-                this.loginError = true;
-                this.errorMessage = e;
-              }
+            .catch(() => {
+              this.loginError = true;
+              this.errorMessage = "¡Ups! Algo salió mal, intente nuevamente.";
             });
       }
       this.tryToLogin = false;
