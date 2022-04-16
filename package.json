@@ -7,11 +7,13 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "capacitor:build": "vue-cli-service capacitor:build",
-    "capacitor:serve": "vue-cli-service capacitor:serve"
+    "capacitor:serve": "vue-cli-service capacitor:serve",
+    "capacitor-assets": "capacitor-assets"
   },
   "dependencies": {
     "@capacitor-community/background-geolocation": "^0.3.11",
     "@capacitor/android": "^2.0.0",
+    "@capacitor/assets": "^1.0.0-next.5",
     "@capacitor/cli": "^2.0.0",
     "@capacitor/core": "^2.0.0",
     "@capacitor/ios": "^2.0.0",
