@@ -42,13 +42,6 @@
         >
       </v-list-item>
 
-      <v-list-item link v-if="isDebugMode" v-on:click="goToTestView">
-        <v-list-item-icon>
-          <v-icon color="grey darken-1">mdi-tune</v-icon>
-        </v-list-item-icon>
-        <v-list-item-title class="grey--text text--darken-1" >Vista de Pruebas (debug)</v-list-item-title>
-      </v-list-item>
-
       <v-switch
           class="ml-4"
           v-model="$vuetify.theme.dark"
@@ -144,9 +137,6 @@ export default {
       userInformation: "restAuth/user",
       resourceId: "restAuth/resourceId"
     }),
-    isDebugMode() {
-      return !!process.env.VUE_APP_DEBUG_MODE
-    }
   }
 }
 </script>
